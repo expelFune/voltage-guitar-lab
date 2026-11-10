@@ -9,6 +9,7 @@ let mode = "scale";
 let root = 9;
 let scaleType = "minorPent";
 let chordRoot = 4;
+let chordNote = roots[chordRoot];
 let quality = "minor";
 let shapeIndex = 0;
 let positions = [];
@@ -67,16 +68,18 @@ function strum(shape, start, volume, destination) {
   });
 }
 
-function renderTones(target, tonic, info) {
+function renderTones(target, tonic, info, note) {
   target.replaceChildren(...info.intervals.map((interval, index) => {
     const label = document.createElement("span");
-    label.textContent = spelling(tonic, interval, info.degrees[index]);
+    label.textContent = spelling(tonic, interval, info.degrees[index], note);
     return label;
   }));
 }
 
 const shapeList = () => chordVoicings(chordRoot, quality);
 const activeShape = () => shapeList()[shapeIndex];
+const selectedChordLabel = () => chordLabel(chordRoot, quality, chordNote);
+const chordRootOptions = () => rootOptions.map(([index, name]) => [index, index === chordRoot ? chordNote : name]);
 const shapeBounds = (shape) => {
   const frets = shape.frets.filter((fret) => fret !== null);
   return [Math.min(...frets), Math.max(...frets)];
@@ -104,7 +107,7 @@ function fretButton(string, fret, info, tonic, shape) {
   const isTone = degreeIndex >= 0;
   const inPosition = mode === "chord" ? shape.frets[string] === fret
     : !activePosition || activePosition.notes[string].includes(fret);
-  const note = isTone ? spelling(tonic, interval, info.degrees[degreeIndex]) : roots[mod(midi)];
+  const note = isTone ? spelling(tonic, interval, info.degrees[degreeIndex], mode === "chord" ? chordNote : undefined) : roots[mod(midi)];
   const label = isTone && $("note-label").value === "degrees" ? info.formula.split(/ +/)[degreeIndex] : note;
   const positionLabel = (6 - string) + " 弦 · " + fret + " 品";
   const pitch = note + (Math.floor(midi / 12) - 1);
@@ -156,9 +159,9 @@ function renderBoard() {
   $("board-summary").hidden = !info;
   $("legend").hidden = !info;
   if (info) {
-    $("board-name").textContent = mode === "scale" ? roots[root] + " " + info.label : chordLabel(chordRoot, quality) + " · " + shape.label;
+    $("board-name").textContent = mode === "scale" ? roots[root] + " " + info.label : selectedChordLabel() + " · " + shape.label;
     $("board-formula").textContent = info.formula;
-    renderTones($("board-tones"), tonic, info);
+    renderTones($("board-tones"), tonic, info, mode === "chord" ? chordNote : undefined);
   }
   $("board-hint").textContent = mode === "scale" ? (scaleType === "blues"
     ? "布鲁斯音阶沿用五个小调五声把位，在指型内加入降五级。全指板显示每个降五级位置。"
@@ -185,7 +188,7 @@ function setMode(next) {
   mode = next;
   document.querySelectorAll("[data-mode]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
   $("root-control").hidden = mode === "all";
-  $("root").value = mode === "chord" ? chordRoot : root;
+  options($("root"), mode === "chord" ? chordRootOptions() : rootOptions, mode === "chord" ? chordRoot : root);
   $("scale-control").hidden = mode !== "scale";
   $("board-quality-control").hidden = mode !== "chord";
   $("board-quality").value = quality;
@@ -206,13 +209,15 @@ function shiftRange(direction) {
   $("fretboard").parentElement.scrollLeft = 0;
 }
 
-function chooseChord(tonic, type, index = 0) {
+function chooseChord(tonic, type, index = 0, note = tonic === chordRoot ? chordNote : roots[tonic]) {
   chordRoot = tonic;
+  chordNote = note;
   quality = type;
   shapeIndex = index;
-  $("chord-root").value = chordRoot;
+  options($("chord-root"), chordRootOptions(), chordRoot);
   $("quality").value = quality;
   renderChords();
+  setInputStatus("chord", "");
   if (mode === "chord") setMode("chord");
 }
 
@@ -312,8 +317,8 @@ function diagram(shape) {
 }
 
 function renderChords() {
-  $("chord-name").textContent = chordLabel(chordRoot, quality) + " · " + qualities[quality].label;
-  renderTones($("chord-tones"), chordRoot, qualities[quality]);
+  $("chord-name").textContent = selectedChordLabel() + " · " + qualities[quality].label;
+  renderTones($("chord-tones"), chordRoot, qualities[quality], chordNote);
   const buttons = shapeList().map((shape, index) => {
     const button = document.createElement("button");
     button.className = "shape-card";
@@ -330,6 +335,17 @@ function renderChords() {
   });
   $("chord-shapes").replaceChildren(...buttons);
 }
+$("chord-search").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const chord = parseChordName($("chord-input").value);
+  if (!chord) {
+    setInputStatus("chord", "请输入图鉴支持的单个和弦名，例如 C、C#m7 或 Bbmaj7。", true);
+    return;
+  }
+  chooseChord(chord.tonic, chord.type, 0, chord.note);
+  setInputStatus("chord", "已找到 " + selectedChordLabel() + " 的 " + shapeList().length + " 套指法。");
+});
+$("chord-input").addEventListener("input", () => setInputStatus("chord", ""));
 $("chord-root").addEventListener("change", (event) => chooseChord(Number(event.target.value), quality));
 $("quality").addEventListener("change", (event) => chooseChord(chordRoot, event.target.value));
 $("play-chord").addEventListener("click", async () => {
@@ -337,7 +353,7 @@ $("play-chord").addEventListener("click", async () => {
   if (await unlockAudio()) strum(shape, audio.currentTime + .02, .12);
 });
 $("show-chord").addEventListener("click", () => setMode("chord"));
-$("add-chord").addEventListener("click", () => addMeasure(chordRoot, quality, shapeIndex));
+$("add-chord").addEventListener("click", () => addMeasure(chordRoot, quality, shapeIndex, chordNote));
 
 const presets = {
   canon: "15634145",
@@ -350,8 +366,7 @@ const presets = {
   power: "E5 G5 A5 G5"
 };
 const storageKey = "voltage-guitar-practice-v2";
-const makeMeasure = ([tonic, type, index = 0]) => ({ tonic, type, index });
-const measureLabel = ({ tonic, type, note }) => (note ?? roots[tonic]) + qualities[type].suffix;
+const measureLabel = ({ tonic, type, note }) => chordLabel(tonic, type, note);
 let practiceKey = 0;
 let practiceMode = "major";
 let relativeSource = "";
@@ -393,11 +408,17 @@ function saveProgression() {
   try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch { /* Keep the current session. */ }
 }
 
+function setInputStatus(group, message, error = false) {
+  const status = $(group + "-status");
+  const input = $(group + "-input");
+  status.textContent = message;
+  status.classList.toggle("error", error);
+  if (error) input.setAttribute("aria-invalid", "true");
+  else input.removeAttribute("aria-invalid");
+}
+
 function setProgressionStatus(message, error = false) {
-  $("progression-status").textContent = message;
-  $("progression-status").classList.toggle("error", error);
-  if (error) $("progression-input").setAttribute("aria-invalid", "true");
-  else $("progression-input").removeAttribute("aria-invalid");
+  setInputStatus("progression", message, error);
 }
 
 function changeProgression(source = "") {
@@ -421,11 +442,12 @@ function applyProgression(input) {
   }
 }
 
-function addMeasure(tonic, type, index = 0) {
+function addMeasure(tonic, type, index = 0, note) {
   if (progression.length >= MAX_MEASURES) return toast("最多可以排 " + MAX_MEASURES + " 小节。");
-  progression.push(makeMeasure([tonic, type, index]));
+  const measure = { tonic, type, index, note };
+  progression.push(measure);
   changeProgression();
-  toast("已加入 " + chordLabel(tonic, type) + " · 第 " + progression.length + " 小节");
+  toast("已加入 " + measureLabel(measure) + " · 第 " + progression.length + " 小节");
 }
 
 function measureButton(text, title, action, disabled = false) {
@@ -594,7 +616,6 @@ function updateNavigation() {
   });
 }
 window.addEventListener("hashchange", updateNavigation);
-options($("root"), rootOptions, root);
 options($("scale"), Object.entries(scales).map(([type, value]) => [type, value.label]), scaleType);
 options($("key-root"), rootOptions, 0);
 options($("chord-root"), rootOptions, chordRoot);

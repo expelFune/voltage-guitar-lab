@@ -7,8 +7,8 @@ const natural = [0, 2, 4, 5, 7, 9, 11];
 const mod = (number, divisor = 12) => ((number % divisor) + divisor) % divisor;
 const MAX_FRET = 24;
 
-function spelling(root, semitones, degree) {
-  const start = letters.indexOf(roots[root][0]);
+function spelling(root, semitones, degree, note = roots[root]) {
+  const start = letters.indexOf(note[0]);
   const letter = (start + degree - 1) % 7;
   const offset = mod(root + semitones - natural[letter] + 6) - 6;
   return letters[letter] + (offset < 0 ? "♭".repeat(-offset) : "♯".repeat(offset));
@@ -131,8 +131,8 @@ function chordVoicings(root, quality) {
   return result;
 }
 
-function chordLabel(root, quality) {
-  return roots[root] + qualities[quality].suffix;
+function chordLabel(root, quality, note = roots[root]) {
+  return note + qualities[quality].suffix;
 }
 
 const keyHarmony = {
@@ -163,6 +163,13 @@ function parseNoteRoot(text) {
   return { tonic: mod(natural[letters.indexOf(letter)] + offset), note: letter + accidental };
 }
 
+function parseChordName(input) {
+  const chord = /^([A-Ga-g](?:[#♯]{1,2}|[b♭]{1,2})?)(.*)$/.exec(input.normalize("NFKC").trim());
+  if (!chord) return null;
+  const type = parseChordQuality(chord[2]);
+  return type ? { ...parseNoteRoot(chord[1]), type } : null;
+}
+
 function parseProgression(input, tonic, mode) {
   const normalized = input.normalize("NFKC").trim();
   const tokens = normalized.split(/[\s,、;|→–—−-]+/).filter(Boolean)
@@ -182,13 +189,10 @@ function parseProgression(input, tonic, mode) {
         return { tonic: mod(tonic + interval), type, index: 0, note: spelling(tonic, interval, index + 1) };
       }
     } else {
-      const chord = /^([A-Ga-g](?:[#♯]{1,2}|[b♭]{1,2})?)(.*)$/.exec(token);
+      const chord = parseChordName(token);
       if (chord) {
-        const type = parseChordQuality(chord[2]);
-        if (type) {
-          relative = false;
-          return { ...parseNoteRoot(chord[1]), type, index: 0 };
-        }
+        relative = false;
+        return { ...chord, index: 0 };
       }
     }
     throw new Error("识别不了「" + token + "」。试试 Am7、Bbmaj7、1645 或 5(7)。");

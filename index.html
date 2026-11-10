@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css">
-<script src="music.js" defer></script>
-<script src="app.js" defer></script>
+<link rel="stylesheet" href="style.css?v=chord-search">
+<script src="music.js?v=chord-search" defer></script>
+<script src="app.js?v=chord-search" defer></script>
 </head>
 <body id="home">
 <header class="site-header">
@@ -75,6 +75,14 @@
   <section id="chords" class="section" aria-labelledby="chord-title">
     <div class="section-heading"><div><div class="kicker">02 / VOICINGS</div><h2 id="chord-title">和弦图鉴</h2></div><p>同一个和弦，换个位置弹。</p></div>
     <article class="panel chord-panel">
+      <form id="chord-search" class="chord-search">
+        <label class="input-label" for="chord-input">输入和弦名</label>
+        <div class="symbol-entry">
+          <input id="chord-input" type="text" maxlength="24" placeholder="C#m7 或 Bbmaj7" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="chord-status">
+          <button type="submit" class="primary">查找指法</button>
+        </div>
+        <p id="chord-status" class="input-status" role="status"></p>
+      </form>
       <div class="chord-head">
         <div class="board-controls">
           <label>根音 <select id="chord-root"></select></label><label>类型 <select id="quality"></select></label>
@@ -101,7 +109,7 @@
             <select id="practice-mode"><option value="major">大调</option><option value="minor">自然小调</option></select>
           </div>
           <label class="input-label" for="progression-input">输入和弦或级数</label>
-          <div class="progression-entry">
+          <div class="symbol-entry">
             <input id="progression-input" type="text" maxlength="320" placeholder="C G Am F 或 1645" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="progression-help progression-status">
             <button type="submit" class="primary">应用进行</button>
           </div>

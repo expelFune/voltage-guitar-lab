@@ -86,6 +86,7 @@ select{max-width:100%}
 .chord-head{display:flex;justify-content:space-between;align-items:center;gap:9px 15px;flex-wrap:wrap;margin-bottom:12px}
 .chord-head .board-controls{margin:0}
 .chord-head #chord-tones{display:inline-flex;margin-left:7px}
+.chord-search{display:grid;gap:5px;margin-bottom:13px;max-width:420px}
 .shape-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .shape-card{background:#232032;border:1px solid #41394f;border-radius:9px;padding:7px 5px;color:var(--muted);min-width:0}
 .shape-card:hover{border-color:var(--violet)}
@@ -98,10 +99,10 @@ select{max-width:100%}
 .progression-editor{display:grid;gap:5px;margin:10px 0 12px}
 .progression-key{margin-bottom:2px}
 .input-label{color:var(--muted);font-size:12px}
-.progression-entry{display:flex;gap:6px;align-items:stretch}
-.progression-entry input{min-width:0;flex:1;border:1px solid #4a415b;border-radius:7px;background:#262237;color:var(--ink);padding:7px 9px;font:14px var(--mono)}
-.progression-entry input::placeholder{color:var(--muted)}
-.progression-entry input[aria-invalid=true]{border-color:#ff9eac}
+.symbol-entry{display:flex;gap:6px;align-items:stretch}
+.symbol-entry input{min-width:0;flex:1;border:1px solid #4a415b;border-radius:7px;background:#262237;color:var(--ink);padding:7px 9px;font:14px var(--mono)}
+.symbol-entry input::placeholder{color:var(--muted)}
+.symbol-entry input[aria-invalid=true]{border-color:#ff9eac}
 .input-status{font-size:12px;color:var(--lime)}
 .input-status:empty{display:none}
 .input-status.error{color:#ffb5c0}
@@ -136,7 +137,7 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
   .fret,.string-label{height:44px}.fret span{height:25px}.fretboard{font-size:12px}
   .section-heading{align-items:flex-end}.section-heading p{font-size:11px;text-align:right}
   .practice-panel{grid-template-columns:minmax(0,1fr)}.metronome{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}
-  .progression-entry input{font-size:16px}
+  .symbol-entry input{font-size:16px}
   .measure-actions button,.secondary,.primary,select,.small-button{min-height:40px}.measure-actions button{min-width:34px}.shape-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
