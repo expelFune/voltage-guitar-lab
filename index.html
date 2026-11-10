@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111119">
+<meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
+<title>弦上实验室 · 电吉他互动指板</title>
+<link rel="stylesheet" href="style.css">
+<script src="music.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body id="home">
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#home"><span class="pick" aria-hidden="true">ϟ</span><span><strong>弦上实验室</strong><small>VOLTAGE GUITAR LAB</small></span></a>
+    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a></nav>
+    <span class="tuning"><i class="online"></i> E A D G B E</span>
+  </div>
+</header>
+<main>
+  <section class="intro" aria-labelledby="title">
+    <img src="guitar.svg" alt="">
+    <div class="kicker">VOLTAGE GUITAR LAB <span>／</span> STANDARD TUNING</div>
+    <h1 id="title">互动<span>指板</span></h1>
+    <p>换一个调，找一个把位。点下去，听听它。</p>
+    <div class="intro-index" aria-hidden="true">6 STRINGS <i></i> 24 FRETS</div>
+  </section>
+
+  <section id="lab" class="section" aria-labelledby="lab-title">
+    <div class="panel board-panel">
+      <div class="panel-heading">
+        <div><div class="kicker">01 / FRETBOARD</div><h2 id="lab-title">指板实验台</h2></div>
+        <div class="segmented" role="group" aria-label="指板模式">
+          <button data-mode="scale" aria-pressed="true">音阶</button>
+          <button data-mode="chord" aria-pressed="false">和弦</button>
+          <button data-mode="all" aria-pressed="false">所有音</button>
+        </div>
+      </div>
+      <div class="board-controls">
+        <label id="root-control">根音 <select id="root"></select></label>
+        <label id="scale-control">音阶 <select id="scale"></select></label>
+        <label id="board-quality-control" hidden>和弦 <select id="board-quality"></select></label>
+        <label id="position-control">把位 <select id="position"></select></label>
+        <label id="label-control">显示 <select id="note-label"><option value="notes">音名</option><option value="degrees">音级</option></select></label>
+      </div>
+      <div class="board-summary" id="board-summary">
+        <div><strong id="board-name"></strong><div id="board-formula"></div></div>
+        <div id="board-tones" class="tones"></div>
+      </div>
+      <div class="board-tools">
+        <div class="range-tools">
+          <button id="previous-range" class="small-button" aria-label="查看更低品位">‹</button>
+          <label><span class="sr-only">指板范围</span><select id="fret-range"></select></label>
+          <button id="next-range" class="small-button" aria-label="查看更高品位">›</button>
+        </div>
+        <button id="play-scale" class="secondary">▷ 试听音阶</button>
+      </div>
+      <div class="board-scroll" tabindex="0" aria-label="指板，较宽时可横向滚动"><div id="fretboard" class="fretboard"></div></div>
+      <div class="board-caption">
+        <div id="legend"><span class="dot root"></span> 根音 <span class="dot other"></span> 组成音 <span class="dot ghost"></span> 把位外</div>
+        <strong id="note-readout" aria-live="polite">点击任意弦与品试听</strong>
+      </div>
+      <p id="board-hint" class="hint"></p>
+    </div>
+    <div class="panel key-panel">
+      <div><div class="kicker">KEY / HARMONY</div><h3>调内和弦</h3><p>点开指法，也可以直接加到练习。</p></div>
+      <div class="key-content">
+        <div class="key-controls"><label>调性 <select id="key-root"></select></label><label class="sr-only" for="key-mode">调式</label><select id="key-mode"><option value="major">大调</option><option value="minor">自然小调</option></select></div>
+        <div id="key-chords" class="key-chords" aria-label="调内和弦"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="chords" class="section" aria-labelledby="chord-title">
+    <div class="section-heading"><div><div class="kicker">02 / VOICINGS</div><h2 id="chord-title">和弦图鉴</h2></div><p>同一个和弦，换个位置弹。</p></div>
+    <article class="panel chord-panel">
+      <div class="chord-head">
+        <div class="board-controls">
+          <label>根音 <select id="chord-root"></select></label><label>类型 <select id="quality"></select></label>
+        </div>
+        <div><strong id="chord-name"></strong><div class="tones" id="chord-tones"></div></div>
+      </div>
+      <div id="chord-shapes" class="shape-list" role="group" aria-label="和弦指法"></div>
+      <div class="chord-bottom">
+        <p class="hint">图上从左到右是 6 → 1 弦。○ 空弦，× 不弹；1–4 分别是食指到小指，横线表示横按。</p>
+        <div class="actions"><button class="secondary" id="play-chord">▷ 试听选中指法</button><a class="secondary" id="show-chord" href="#lab">在指板上看</a><button class="primary" id="add-chord">＋ 加入练习</button></div>
+      </div>
+    </article>
+  </section>
+
+  <section id="practice" class="section" aria-labelledby="practice-title">
+    <div class="section-heading"><div><div class="kicker">03 / KEEP TIME</div><h2 id="practice-title">节拍练习</h2></div><p>排好和弦，跟着节拍灯循环弹。</p></div>
+    <div class="panel practice-panel">
+      <div class="practice-copy">
+        <h3>我的和弦进行</h3><p>每张卡片占一小节。在第一拍换和弦，或把重复的和弦加两次。</p>
+        <form id="progression-form" class="progression-editor">
+          <div class="board-controls progression-key">
+            <label>练习调性 <select id="practice-key"></select></label>
+            <label class="sr-only" for="practice-mode">练习调式</label>
+            <select id="practice-mode"><option value="major">大调</option><option value="minor">自然小调</option></select>
+          </div>
+          <label class="input-label" for="progression-input">输入和弦或级数</label>
+          <div class="progression-entry">
+            <input id="progression-input" type="text" maxlength="320" placeholder="C G Am F 或 1645" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="progression-help progression-status">
+            <button type="submit" class="primary">应用进行</button>
+          </div>
+          <p id="progression-help" class="hint">支持 C#、Bb、Am7 等写法，用空格、逗号或横线分隔。输入 1645 会按选调生成；也可以用 5(7) 指定属七。</p>
+          <p id="progression-status" class="input-status" role="status"></p>
+        </form>
+        <div class="preset-row" aria-label="练习预设">
+          <button type="button" class="secondary" data-preset="canon">卡农 · 15634145</button>
+          <button type="button" class="secondary" data-preset="dooWop">经典 · 1645</button>
+          <button type="button" class="secondary" data-preset="pop">流行 · 1564</button>
+          <button type="button" class="secondary" data-preset="jazz">爵士 · 251</button>
+          <button type="button" class="secondary" data-preset="blues">12 小节布鲁斯</button>
+          <button type="button" class="secondary" data-preset="open">Em · Am</button>
+          <button type="button" class="secondary" data-preset="gMajor">G · D · Em · C</button>
+          <button type="button" class="secondary" data-preset="power">E5 · G5 · A5 · G5</button>
+        </div>
+        <div id="progression" class="progression" aria-label="自定义和弦顺序"></div>
+        <form id="add-form" class="board-controls"><label>根音 <select id="practice-root"></select></label><label>类型 <select id="practice-quality"></select></label><button type="submit" class="secondary">＋ 添加和弦</button></form>
+        <p class="hint">排序用 ← →，删除用 ×。从图鉴加入时也会保留所选把位。</p>
+      </div>
+      <div class="metronome">
+        <div class="tempo"><output id="tempo-value" for="tempo">70</output> BPM</div>
+        <div class="tempo-row"><button id="tempo-down" class="small-button" aria-label="降低 5 BPM">−</button><label class="sr-only" for="tempo">每分钟拍数</label><input type="range" id="tempo" min="35" max="200" value="70"><button id="tempo-up" class="small-button" aria-label="提高 5 BPM">+</button></div>
+        <div id="beats" class="beats" aria-label="节拍指示灯"></div>
+        <label class="meter-label">每小节 <select id="meter"><option value="3">3 拍</option><option value="4" selected>4 拍</option><option value="6">6 拍</option></select></label>
+        <label class="demo-toggle"><input id="practice-demo" type="checkbox" checked> 播放和弦示范</label>
+        <button class="primary" id="metronome-button">▶ 开始练习</button>
+        <span id="current-chord" class="hint" aria-live="off">准备就绪</span>
+      </div>
+    </div>
+  </section>
+  <footer><span>ϟ　弦上实验室</span><span>STANDARD TUNING / EADGBE</span></footer>
+</main>
+<div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
