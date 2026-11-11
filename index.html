@@ -6,10 +6,11 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=mobile-meter">
-<script src="music.js?v=clean-c" defer></script>
+<link rel="stylesheet" href="style.css?v=chord-builder">
+<script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
-<script src="app.js?v=clean-c" defer></script>
+<script src="app.js?v=chord-builder" defer></script>
+<script src="builder.js?v=chord-builder" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
 <body id="home">
@@ -64,6 +65,7 @@
         <strong id="note-readout" aria-live="polite">点击任意弦与品试听</strong>
       </div>
       <p id="board-hint" class="hint"></p>
+      <p class="hint">手机可用多个手指同时按音。横向浏览请拖动指板顶部的品号区域，或切换品位范围。</p>
     </div>
     <div class="panel key-panel">
       <div><div class="kicker">KEY / HARMONY</div><h3>调内和弦</h3><p>点开指法，也可以直接加到练习。</p></div>
@@ -107,6 +109,18 @@
     <div class="panel practice-panel">
       <div class="practice-copy">
         <h3>我的和弦进行</h3><p>每张卡片占一小节。在第一拍换和弦，或把重复的和弦加两次。</p>
+        <div class="chord-builder">
+          <h3>按音级组一个和弦</h3>
+          <form id="builder-form">
+            <div class="board-controls"><label>1 的音名 <select id="builder-root"></select></label></div>
+            <label class="input-label" for="builder-input">组成音级（以大调为基准）</label>
+            <div class="symbol-entry"><input id="builder-input" type="text" value="135" maxlength="50" placeholder="135 或 1 b3 5" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="builder-status"><button class="secondary" type="submit">识别和弦</button></div>
+          </form>
+          <div class="builder-result"><div id="builder-tones" class="tones"></div><label class="sr-only" for="builder-match">和弦名称</label><select id="builder-match"></select></div>
+          <p id="builder-status" class="input-status" role="status"></p>
+          <div class="actions"><a id="builder-view" class="secondary" href="#chords">查看指法</a><button id="builder-add" type="button" class="primary">＋ 加入练习</button></div>
+          <p class="hint">例如 C 的 135 = C 大三和弦，1 b3 5 = Cm。可识别图鉴中的 12 类和弦；上方输入是一组和弦的组成音，下方输入是和弦进行。</p>
+        </div>
         <form id="progression-form" class="progression-editor">
           <div class="board-controls progression-key">
             <label>练习调性 <select id="practice-key"></select></label>

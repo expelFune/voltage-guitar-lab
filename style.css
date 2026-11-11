@@ -73,6 +73,13 @@ select{max-width:100%}
 .fret.root span{background:var(--lime);color:#242817}
 .fret:hover,.fret.selected{background:#564174}
 .fret.selected span{outline:2px solid #fff;outline-offset:1px}
+.fret{touch-action:none;user-select:none;-webkit-user-select:none}
+.fret.held{background:#574273}
+.fret.held span{outline:2px solid #fff;outline-offset:2px;box-shadow:0 0 12px #d8fb7c88}
+.chord-builder{border:1px solid #4b405e;background:#211e2e;border-radius:10px;padding:12px;margin:12px 0}
+.builder-result{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0}
+.builder-result strong{color:var(--lime);font-size:18px}
+.builder-result .tones{margin-right:5px}
 .board-caption{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;margin:7px 0;font-size:12px;color:var(--muted)}
 .board-caption strong{color:var(--lime);font-weight:600}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 0;background:var(--lime)}

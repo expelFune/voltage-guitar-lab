@@ -16,6 +16,7 @@ let positions = [];
 let activePosition;
 let activeRange = mobile.matches ? windows[0] : [0,12];
 let selected;
+const heldFretNotes = new Map();
 const rootLabel = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
 function options(select, items, current) {
@@ -122,17 +123,44 @@ function fretButton(string, fret, info, tonic, shape) {
   const badge = document.createElement("span");
   badge.textContent = label;
   cell.append(badge);
-  cell.addEventListener("click", async () => {
+  async function sound() {
+    if (await unlockAudio()) pluck(midi, audio.currentTime + .01, .15);
+  }
+  function showHeldNotes() {
+    $("note-readout").textContent = [...heldFretNotes.values()].map((entry) => entry.pitch + " / " + entry.position).join(" ＋ ") || pitch + " / " + positionLabel;
+  }
+  cell.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || heldFretNotes.has(event.pointerId)) return;
+    event.preventDefault();
+    heldFretNotes.set(event.pointerId, { cell, pitch, position: positionLabel });
+    cell.setPointerCapture(event.pointerId);
+    cell.classList.add("held");
+    showHeldNotes();
+    void sound();
+  });
+  function release(event) {
+    if (!heldFretNotes.has(event.pointerId)) return;
+    heldFretNotes.delete(event.pointerId);
+    if (![...heldFretNotes.values()].some((entry) => entry.cell === cell)) cell.classList.remove("held");
+    if (cell.hasPointerCapture(event.pointerId)) cell.releasePointerCapture(event.pointerId);
+    showHeldNotes();
+  }
+  cell.addEventListener("pointerup", release);
+  cell.addEventListener("pointercancel", release);
+  cell.addEventListener("lostpointercapture", release);
+  cell.addEventListener("click", (event) => {
+    if (event.detail !== 0) return;
     selected = positionLabel;
     $("fretboard").querySelector(".selected")?.classList.remove("selected");
     cell.classList.add("selected");
     $("note-readout").textContent = pitch + "  /  " + positionLabel;
-    if (await unlockAudio()) pluck(midi, audio.currentTime + .01, .23);
+    void sound();
   });
   return cell;
 }
 
 function renderBoard() {
+  heldFretNotes.clear();
   const [first, last] = activeRange;
   const info = mode === "scale" ? scales[scaleType] : mode === "chord" ? qualities[quality] : null;
   const tonic = mode === "chord" ? chordRoot : root;
