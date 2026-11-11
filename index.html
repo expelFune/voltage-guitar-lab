@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=live-neck">
-<script src="music.js?v=live-neck" defer></script>
-<script src="neck.js?v=live-neck" defer></script>
-<script src="app.js?v=live-neck" defer></script>
+<link rel="stylesheet" href="style.css?v=pick-neck">
+<script src="music.js?v=pick-neck" defer></script>
+<script src="neck.js?v=pick-neck" defer></script>
+<script src="app.js?v=pick-neck" defer></script>
 </head>
 <body id="home">
 <header class="site-header">
@@ -92,7 +92,7 @@
       </div>
       <div class="voicing-layout">
         <div><div class="finger-key"><span>① 食指</span><span>② 中指</span><span>③ 无名指</span><span>④ 小指</span></div><div id="chord-shapes" class="shape-list" role="group" aria-label="和弦指法"></div></div>
-        <div class="neck-stage"><div class="neck-heading"><span class="kicker">LIVE / FINGERING</span><strong id="neck-chord-label"></strong></div><div id="chord-neck" class="live-neck"></div><p class="hint">从左到右是 6 → 1 弦，点琴弦可逐根试听。</p></div>
+        <div class="neck-stage"><div class="neck-heading"><span class="kicker">LIVE / FINGERING</span><strong id="neck-chord-label"></strong></div><label class="neck-label-control">显示 <select data-neck-label aria-label="和弦琴颈音名或唱名"><option value="notes">音名 · C D E</option><option value="solfege">唱名 · 固定 Do</option></select></label><div id="chord-neck" class="live-neck"></div><p class="hint">从左到右是 6 → 1 弦。点弦单拨，按住横划扫弦；唱名采用固定 Do（C = Do）。</p></div>
       </div>
       <div class="chord-bottom">
         <p class="hint">图上从左到右是 6 → 1 弦。○ 空弦，× 不弹；1–4 分别是食指到小指，横线表示横按。</p>
@@ -135,7 +135,7 @@
         <p class="hint">排序用 ← →，删除用 ×。从图鉴加入时也会保留所选把位。</p>
       </div>
       <div class="metronome">
-        <div class="neck-stage practice-stage"><div class="neck-heading"><span class="kicker">NOW PLAYING</span><strong id="practice-neck-label"></strong></div><div id="practice-neck" class="live-neck"></div><div id="picking-steps" class="picking-steps" aria-label="拨弦顺序"></div><p class="hint" id="picking-hint"></p></div>
+        <div class="neck-stage practice-stage"><div class="neck-heading"><span class="kicker">NOW PLAYING</span><strong id="practice-neck-label"></strong></div><label class="neck-label-control">显示 <select data-neck-label aria-label="练习琴颈音名或唱名"><option value="notes">音名 · C D E</option><option value="solfege">唱名 · 固定 Do</option></select></label><div id="practice-neck" class="live-neck"></div><div id="picking-steps" class="picking-steps" aria-label="拨弦顺序"></div><p class="hint" id="picking-hint"></p></div>
         <label class="meter-label">弹奏方式 <select id="playback-style"><option value="strum">每小节扫弦</option><option value="arpeggio">八分音符分解</option></select></label>
         <div class="tempo"><output id="tempo-value" for="tempo">70</output> BPM</div>
         <div class="tempo-row"><button id="tempo-down" class="small-button" aria-label="降低 5 BPM">−</button><label class="sr-only" for="tempo">每分钟拍数</label><input type="range" id="tempo" min="35" max="200" value="70"><button id="tempo-up" class="small-button" aria-label="提高 5 BPM">+</button></div>

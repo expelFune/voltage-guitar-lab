@@ -95,6 +95,13 @@ select{max-width:100%}
 .neck-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .neck-heading strong{color:#ffda87;font:700 30px/1.2 var(--mono)}
 .live-neck{max-width:310px;width:100%;margin:6px auto 0}
+.live-neck{position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.live-neck.is-picking{cursor:none}
+.live-neck.is-picking .neck-hit{cursor:none}
+.neck-label-control{display:flex;align-items:center;justify-content:flex-end;gap:6px;color:var(--muted);font-size:11px;margin-top:8px}
+.neck-label-control select{font-size:11px;min-height:32px;max-width:170px}
+.neck-pick{pointer-events:none;filter:drop-shadow(0 2px 3px #000a)}
+.neck-pitch{font-size:11px}
 .live-neck svg{display:block;width:100%;height:auto;overflow:visible}
 .neck-string-name{fill:#cdc7d5;font:12px var(--mono);text-anchor:middle}
 .neck-fret-number{fill:#c8bfd1;font:11px var(--mono);text-anchor:middle}

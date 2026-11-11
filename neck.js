@@ -2,6 +2,34 @@
 
 const fingerColors = ["#f2d9a0", "#54d99b", "#65b8ff", "#ffb451", "#f37ba6"];
 const neckAnimations = new WeakMap();
+const neckInteractions = new WeakMap();
+let neckLabelMode = "notes";
+
+function neckNoteLabel(note) {
+  if (neckLabelMode === "notes" || note === "—") return note;
+  const names = { C: "Do", D: "Re", E: "Mi", F: "Fa", G: "Sol", A: "La", B: "Si" };
+  return note.slice(1) + names[note[0]];
+}
+
+function setNeckLabelMode(mode) {
+  neckLabelMode = mode;
+  document.querySelectorAll("[data-neck-label]").forEach((select) => { select.value = mode; });
+  document.querySelectorAll(".live-neck [data-note]").forEach((label) => {
+    label.textContent = neckNoteLabel(label.dataset.note);
+  });
+}
+
+function crossedNeckStrings(from, to) {
+  if (from.x === to.x) return [];
+  return Array.from({ length: 6 }, (_, string) => ({ string, x: 60 + string * 37 }))
+    .map((hit) => ({ ...hit, progress: (hit.x - from.x) / (to.x - from.x) }))
+    .filter((hit) => {
+      const y = from.y + hit.progress * (to.y - from.y);
+      return hit.progress > 0 && hit.progress <= 1 && y >= 62 && y <= 372;
+    })
+    .sort((a, b) => a.progress - b.progress)
+    .map((hit) => hit.string);
+}
 
 function clearNeckAnimation(container) {
   for (const timer of neckAnimations.get(container) || []) clearTimeout(timer);
@@ -49,7 +77,8 @@ function neckDiagram(shape, tonic, type, note, id) {
     const interval = muted ? -1 : mod(tuning[string] + fret - tonic);
     const degree = info.intervals.indexOf(interval);
     const pitch = muted ? "—" : spelling(tonic, interval, info.degrees[degree], note);
-    parts.push('<text class="neck-string-name" x="' + center + '" y="19">' + roots[mod(tuning[string])] + '</text>',
+    const openNote = roots[mod(tuning[string])];
+    parts.push('<text class="neck-string-name" data-note="' + openNote + '" x="' + center + '" y="19">' + neckNoteLabel(openNote) + '</text>',
       '<text class="neck-open ' + (muted ? 'muted' : '') + '" x="' + center + '" y="45">' + (muted ? "×" : fret === 0 ? "○" : "") + '</text>',
       '<g class="neck-string' + (muted ? ' muted' : '') + '" data-neck-string="' + string + '">',
       '<path class="string-glow" d="M' + center + ' 64V370"/>',
@@ -58,18 +87,19 @@ function neckDiagram(shape, tonic, type, note, id) {
       const finger = shape.fingers[string];
       parts.push('<circle cx="' + center + '" cy="' + y(fret) + '" r="14" fill="' + fingerColors[finger] + '" stroke="#ffffffaa" stroke-width="1.5"/><text class="neck-finger" x="' + center + '" y="' + (y(fret) + 5) + '">' + finger + '</text>');
     }
-    parts.push('</g><text class="neck-pitch" x="' + center + '" y="393">' + pitch + '</text>',
+    parts.push('</g><text class="neck-pitch" data-note="' + pitch + '" x="' + center + '" y="393">' + neckNoteLabel(pitch) + '</text>',
       '<text class="neck-string-number" x="' + center + '" y="413">' + (6 - string) + '</text>');
   });
   // Broad transparent targets keep each string easy to pluck on a phone.
   shape.frets.forEach((fret, string) => {
     if (fret !== null) parts.push('<rect class="neck-hit" data-pluck="' + string + '" x="' + (x(string) - 17) + '" y="62" width="34" height="310" fill="transparent" role="button" tabindex="0" aria-label="拨响 ' + (6 - string) + ' 弦，' + (fret === 0 ? '空弦' : fret + ' 品') + '"/>');
   });
-  parts.push('</svg>');
+  parts.push('<g class="neck-pick" aria-hidden="true" visibility="hidden"><path d="M-12-10Q0-17 12-10Q17-4 0 15Q-17-4-12-10Z" fill="#ffe09b" stroke="#fff5d6" stroke-width="1.5"/><path d="M-5-6Q0-10 5-6" fill="none" stroke="#b68745" stroke-width="1.5"/></g></svg>');
   return parts.join("");
 }
 
 function renderNeck(container, measure) {
+  neckInteractions.get(container)?.();
   clearNeckAnimation(container);
   container.innerHTML = measure ? neckDiagram(chordVoicings(measure.tonic, measure.type)[measure.index], measure.tonic, measure.type, measure.note, container.id)
     : '<p class="hint neck-empty">添加和弦后，这里会显示当前小节的指法。</p>';

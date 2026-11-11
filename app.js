@@ -344,23 +344,95 @@ function renderChordNeck() {
 }
 
 function bindNeckPlucking(container, getMeasure) {
-  async function play(event) {
-    const hit = event.target.closest("[data-pluck]");
-    if (!hit || !container.contains(hit)) return;
-    if (event.type === "keydown") {
-      if (!["Enter", " "].includes(event.key)) return;
-      event.preventDefault();
-    }
-    const measure = getMeasure();
-    if (!measure || (container.id === "practice-neck" && running)) return;
-    const string = Number(hit.dataset.pluck);
-    const shape = chordVoicings(measure.tonic, measure.type)[measure.index];
-    if (shape.frets[string] === null || !await unlockAudio()) return;
-    pluck(tuning[string] + shape.frets[string], audio.currentTime + .01, .2);
-    pulseNeck(container, string);
+  let pointer, previous, lastString, ready, nextAudioTime = 0, generation = 0, direction = 0;
+  function reset() {
+    generation++;
+    pointer = undefined;
+    previous = undefined;
+    lastString = undefined;
+    direction = 0;
+    container.classList.remove("is-picking");
+    container.querySelector(".neck-pick")?.setAttribute("visibility", "hidden");
   }
-  container.addEventListener("click", play);
-  container.addEventListener("keydown", play);
+  neckInteractions.set(container, reset);
+  function canPlay() {
+    return getMeasure() && !(container.id === "practice-neck" && running);
+  }
+  async function playString(string, audioReady) {
+    const measure = getMeasure();
+    if (!measure || !canPlay()) return;
+    const shape = chordVoicings(measure.tonic, measure.type)[measure.index];
+    if (shape.frets[string] === null) return;
+    const currentGeneration = generation;
+    if (!await audioReady || currentGeneration !== generation) return;
+    nextAudioTime = Math.max(audio.currentTime + .01, nextAudioTime);
+    pluck(tuning[string] + shape.frets[string], nextAudioTime, .2);
+    pulseNeck(container, string, (nextAudioTime - audio.currentTime) * 1000);
+    nextAudioTime += .018;
+  }
+  function position(event) {
+    const svg = container.querySelector("svg");
+    const matrix = svg?.getScreenCTM();
+    return matrix ? new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse()) : null;
+  }
+  function movePick(point) {
+    const inside = point && point.x >= 34 && point.x <= 272 && point.y >= 62 && point.y <= 372;
+    const pick = container.querySelector(".neck-pick");
+    pick?.setAttribute("visibility", inside ? "visible" : "hidden");
+    if (inside) pick?.setAttribute("transform", "translate(" + point.x + " " + point.y + ")");
+    container.classList.toggle("is-picking", Boolean(inside));
+  }
+  function hitString(string) {
+    if (string === lastString) return;
+    lastString = string;
+    void playString(string, ready);
+  }
+  container.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || event.button !== 0 || pointer !== undefined || !canPlay()) return;
+    const point = position(event);
+    if (!point || point.x < 34 || point.x > 272 || point.y < 62 || point.y > 372) return;
+    pointer = event.pointerId;
+    previous = point;
+    lastString = undefined;
+    direction = 0;
+    nextAudioTime = 0;
+    ready = unlockAudio();
+    container.setPointerCapture(pointer);
+    movePick(point);
+    const string = Math.round((point.x - 60) / 37);
+    if (string >= 0 && string < 6 && Math.abs(point.x - (60 + string * 37)) <= 18.5) hitString(string);
+  });
+  container.addEventListener("pointermove", (event) => {
+    if (pointer === undefined && event.pointerType === "touch") return;
+    if (!canPlay()) return reset();
+    if (pointer !== undefined && event.pointerId !== pointer) return;
+    const point = position(event);
+    movePick(point);
+    if (pointer === undefined || !point) return;
+    const nextDirection = Math.sign(point.x - previous.x);
+    if (direction && nextDirection && direction !== nextDirection) lastString = undefined;
+    if (nextDirection) direction = nextDirection;
+    for (const string of crossedNeckStrings(previous, point)) hitString(string);
+    previous = point;
+  });
+  function release(event) {
+    if (event.pointerId !== pointer) return;
+    if (container.hasPointerCapture(pointer)) container.releasePointerCapture(pointer);
+    pointer = undefined;
+    previous = undefined;
+    movePick(null);
+  }
+  container.addEventListener("pointerup", release);
+  container.addEventListener("lostpointercapture", release);
+  container.addEventListener("pointercancel", () => reset());
+  container.addEventListener("pointerleave", () => { if (pointer === undefined) movePick(null); });
+  container.addEventListener("keydown", (event) => {
+    const hit = event.target.closest("[data-pluck]");
+    if (!hit || !container.contains(hit) || !["Enter", " "].includes(event.key) || event.repeat || !canPlay()) return;
+    event.preventDefault();
+    nextAudioTime = 0;
+    void playString(Number(hit.dataset.pluck), unlockAudio());
+  });
 }
 $("chord-search").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -690,6 +762,9 @@ function updateNavigation() {
   });
 }
 window.addEventListener("hashchange", updateNavigation);
+document.querySelectorAll("[data-neck-label]").forEach((select) => {
+  select.addEventListener("change", () => setNeckLabelMode(select.value));
+});
 bindNeckPlucking($("chord-neck"), () => ({ tonic: chordRoot, type: quality, index: shapeIndex, note: chordNote }));
 bindNeckPlucking($("practice-neck"), () => previewMeasure);
 options($("scale"), Object.entries(scales).map(([type, value]) => [type, value.label]), scaleType);
