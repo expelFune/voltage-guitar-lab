@@ -85,6 +85,13 @@ function parseTunerTargets(text) {
   let reference = 440, lastFrequency = null, history = [], lastSignal = 0, lastFrame = 0;
   const thresholds = { high: .0006, standard: .002, low: .006 };
 
+  function setInputLevel(value) {
+    const level = Math.max(0, Math.min(100, value));
+    el("tuner-input-fill").style.width = level.toFixed(1) + "%";
+    el("tuner-level-value").textContent = Math.round(level) + "%";
+    el("tuner-input-level").setAttribute("aria-valuenow", String(Math.round(level)));
+  }
+
   function targetText() {
     return el("tuner-mode").value === "chromatic" ? "自动识别最近的半音"
       : locked === null ? "自动匹配最近的空弦目标" : "锁定 " + (6 - locked) + " 弦 · " + tunerNoteName(targets[locked]);
@@ -164,7 +171,7 @@ function parseTunerTargets(text) {
     context = null;
     el("tuner-start").textContent = "开启麦克风";
     el("tuner-status").textContent = message;
-    el("tuner-input-level").value = 0;
+    setInputLevel(0);
     el("tuner-signal").textContent = "等待麦克风";
     resetReading();
   }
@@ -216,7 +223,7 @@ function parseTunerTargets(text) {
           for (let i = 0; i < buffer.length; i++) energy += buffer[i] * buffer[i];
           const rms = Math.sqrt(energy / buffer.length);
           const threshold = thresholds[el("tuner-sensitivity").value] ?? thresholds.high;
-          el("tuner-input-level").value = Math.max(0, Math.min(100, (20 * Math.log10(Math.max(rms, 1e-8)) + 72) / 72 * 100));
+          setInputLevel((20 * Math.log10(Math.max(rms, 1e-8)) + 72) / 72 * 100);
           const frequency = estimateTunerPitch(buffer, localContext.sampleRate, threshold);
           el("tuner-signal").textContent = rms < threshold ? "输入较轻，可再靠近一点麦克风" : frequency ? "已捕捉到单音" : "有声音，等待清晰的单音";
           if (frequency) {

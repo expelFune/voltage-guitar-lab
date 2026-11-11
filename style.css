@@ -181,9 +181,11 @@ input[type=range],input[type=checkbox]{accent-color:var(--lime)}
 .tuner-meter::before{content:"";position:absolute;left:5%;right:5%;top:9px;height:28px;border-top:1px solid #81708d;border-bottom:1px solid #81708d}
 .tuner-center{position:absolute;left:45.5%;width:9%;height:32px;top:7px;background:#d8fb7c20;border:1px solid #d8fb7c70;border-radius:4px}
 .tuner-needle{position:absolute;top:2px;left:50%;height:42px;width:3px;background:#ffcf82;transform:translateX(-50%);box-shadow:0 0 10px #ffcf8240;transition:left .05s linear}
-.tuner-input{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;color:var(--muted);font-size:12px}
-.tuner-input meter{width:110px;height:15px;accent-color:var(--lime)}
-.tuner-input span{flex-basis:100%;font-size:11px}
+.tuner-input{display:grid;grid-template-columns:1fr auto;gap:6px 10px;width:100%;max-width:320px;padding:11px 12px;margin:7px 0;border:1px solid #53465f;border-radius:8px;background:#15141f;color:var(--muted);font-size:12px}
+.tuner-input output{font:12px var(--mono);color:var(--lime)}
+#tuner-input-level{grid-column:1/-1;overflow:hidden;height:15px;width:100%;background:#322b40;border:1px solid #6b5c7b;border-radius:8px}
+#tuner-input-fill{width:0;height:100%;border-radius:7px;background:linear-gradient(90deg,#85cf8b,#d8fb7c);transition:width .05s linear}
+#tuner-signal{grid-column:1/-1;font-size:11px}
 .tuner-direction{color:#ffcf82;font-size:15px;min-height:24px;text-align:center}
 .tuner-display.in-tune .tuner-note,.tuner-display.in-tune .tuner-direction{color:var(--lime)}
 .tuner-display.in-tune .tuner-needle{background:var(--lime)}
@@ -208,4 +210,4 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
   .symbol-entry input{font-size:16px}
   .measure-actions button,.secondary,.primary,select,.small-button{min-height:40px}.measure-actions button{min-width:34px}.shape-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}.tuner-needle{transition:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}.tuner-needle,#tuner-input-fill{transition:none}}
