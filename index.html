@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=piano-1">
+<link rel="stylesheet" href="style.css?v=piano-mobile-2">
 <script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=chord-builder" defer></script>
-<script src="piano.js?v=piano-1" defer></script>
+<script src="piano.js?v=piano-mobile-2" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
 <body id="home">
@@ -195,11 +195,12 @@
     <div class="panel piano-panel">
       <div id="piano-workspace" class="piano-workspace" aria-label="可弹奏钢琴">
         <div class="piano-toolbar">
-          <div class="board-controls"><label>起始音区 <select id="piano-octave"><option value="48">C3</option><option value="60" selected>C4</option><option value="72">C5</option></select></label><label>键盘 <select id="piano-span"><option value="12">一组八度</option><option value="24" selected>两组八度</option></select></label></div>
+          <div class="board-controls"><label>起始音区 <select id="piano-octave"></select></label><label>键盘 <select id="piano-span"><option value="12">1 组八度</option><option value="24" selected>2 组八度</option><option value="36">3 组八度</option><option value="48">4 组八度</option><option value="60">5 组八度</option><option value="72">6 组八度</option><option value="84">7 组八度</option></select></label><span class="piano-zoom"><button id="piano-zoom-out" class="small-button" type="button" aria-label="缩小琴键">−</button><output id="piano-zoom-label">键宽 42px</output><button id="piano-zoom-in" class="small-button" type="button" aria-label="放大琴键">＋</button></span></div>
           <button type="button" id="piano-expand" class="secondary">⛶ 放大 / 横屏</button>
         </div>
         <div class="piano-readout"><strong id="piano-note">点琴键开始弹奏</strong><label class="demo-toggle"><input type="checkbox" id="piano-computer" checked> 电脑键盘映射</label></div>
-        <p class="hint piano-help">电脑用 A W S E D F T G Y H U J K O L P ; 弹奏。手机支持多指同弹，点“放大 / 横屏”展开。</p>
+        <p class="hint piano-help">电脑用 A W S E D F T G Y H U J K O L P ; 弹奏。手机可多指同弹，放大后固定横向布局；音域较宽时可拖动音域条或琴键上方空白处。</p>
+        <div class="piano-range-strip"><button id="piano-range-down" class="small-button" type="button" aria-label="降低一个八度">‹</button><label for="piano-range">滑动选音域 <output id="piano-range-label">C4 — C6</output></label><input id="piano-range" type="range" min="24" max="84" step="12" value="60"><button id="piano-range-up" class="small-button" type="button" aria-label="提高一个八度">›</button></div>
         <div id="piano-scroll" class="piano-scroll" tabindex="0" aria-label="钢琴键盘，较宽时可横向滚动"><div id="piano-keys" class="piano-keys" role="group" aria-label="可弹奏琴键"></div></div>
         <p id="piano-screen-status" class="hint" role="status"></p>
       </div>

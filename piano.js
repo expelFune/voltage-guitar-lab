@@ -22,6 +22,7 @@ function sameEarAnswer(answer, expected) {
   let context, master, base = 60, span = matchMedia("(max-width:600px)").matches ? 12 : 24;
   let target = null, guesses = new Set(), revealed = false, answered = 0, correct = 0, auditionEpoch = 0;
   let expanded = false, nativeFullscreen = false, oldOverflow = "", oldSpan, returnFocus;
+  let keyWidth = 42;
   const noteName = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
   async function ensureAudio() {
@@ -136,15 +137,35 @@ function sameEarAnswer(answer, expected) {
 
   function renderKeyboard() {
     silence();
+    const previousBase = base;
+    base = Math.max(24, Math.min(108 - span, base));
+    if (base !== previousBase) clearQuestion();
+    const startNotes = Array.from({ length: Math.floor((108 - span - 24) / 12) + 1 }, (_, i) => 24 + i * 12);
+    el("piano-octave").replaceChildren(...startNotes.map((midi) => {
+      const option = document.createElement("option");
+      option.value = midi;
+      option.textContent = noteName(midi);
+      return option;
+    }));
+    el("piano-octave").value = base;
+    el("piano-range").max = 108 - span;
+    el("piano-range").value = base;
+    el("piano-range-label").textContent = noteName(base) + " — " + noteName(base + span);
+    el("piano-range-down").disabled = base === 24;
+    el("piano-range-up").disabled = base === 108 - span;
     const notes = Array.from({ length: span + 1 }, (_, index) => base + index);
     const whiteCount = notes.filter((note) => whitePitchClasses.includes(mod(note))).length;
     let whites = 0;
     board.style.setProperty("--piano-whites", whiteCount);
+    board.style.setProperty("--piano-key-width", keyWidth + "px");
+    board.dataset.whites = whiteCount;
+    board.style.minWidth = (whiteCount * keyWidth) + "px";
     board.replaceChildren(...notes.map((midi) => {
       const black = !whitePitchClasses.includes(mod(midi)), key = document.createElement("button"), offset = midi - base;
       key.type = "button";
       key.className = "piano-key " + (black ? "black" : "white");
       key.dataset.pianoMidi = midi;
+      key.style.width = ((black ? 62 : 100) / whiteCount) + "%";
       const letter = keyCodes[offset] ? keyCodes[offset].replace("Key","").replace("Semicolon",";") : "";
       key.setAttribute("aria-label", noteName(midi) + (letter ? "，电脑按键 " + letter : ""));
       if (black) key.style.left = (whites / whiteCount * 100) + "%";
@@ -286,19 +307,52 @@ function sameEarAnswer(answer, expected) {
   el("ear-reveal").addEventListener("click", () => finish(true));
   for (const id of ["ear-count","ear-pool","ear-order"]) el(id).addEventListener("change", clearQuestion);
   el("ear-give-reference").addEventListener("change", () => { auditionEpoch++; for (const sound of auditionVoices) sound.stop(true); auditionVoices.clear(); });
-  el("piano-octave").addEventListener("change", () => { base = Number(el("piano-octave").value); clearQuestion(); renderKeyboard(); });
-  el("piano-span").addEventListener("change", () => { span = Number(el("piano-span").value); renderKeyboard(); });
+  function changeRange(nextBase, nextSpan = span) {
+    const previousBase = base;
+    span = nextSpan;
+    base = Math.max(24, Math.min(108 - span, nextBase));
+    if (base !== previousBase) clearQuestion();
+    renderKeyboard();
+    el("piano-scroll").scrollLeft = 0;
+  }
+  el("piano-octave").addEventListener("change", () => changeRange(Number(el("piano-octave").value)));
+  el("piano-span").addEventListener("change", () => changeRange(base, Number(el("piano-span").value)));
+  el("piano-range").addEventListener("input", () => changeRange(Number(el("piano-range").value)));
+  el("piano-range-down").addEventListener("click", () => changeRange(base - 12));
+  el("piano-range-up").addEventListener("click", () => changeRange(base + 12));
+  function zoom(direction) {
+    const oldWidth = keyWidth, scroll = el("piano-scroll");
+    keyWidth = Math.max(24, Math.min(96, keyWidth + direction * 6));
+    board.style.setProperty("--piano-key-width", keyWidth + "px");
+    board.style.minWidth = (Number(board.dataset.whites) * keyWidth) + "px";
+    scroll.scrollLeft *= keyWidth / oldWidth;
+    el("piano-zoom-label").textContent = "键宽 " + keyWidth + "px";
+    el("piano-zoom-out").disabled = keyWidth === 24;
+    el("piano-zoom-in").disabled = keyWidth === 96;
+  }
+  el("piano-zoom-out").addEventListener("click", () => zoom(-1));
+  el("piano-zoom-in").addEventListener("click", () => zoom(1));
+  function updateLandscape() {
+    const width = window.visualViewport?.width || window.innerWidth;
+    const height = window.visualViewport?.height || window.innerHeight;
+    const touch = matchMedia("(pointer:coarse)").matches || navigator.maxTouchPoints > 0;
+    workspace.classList.toggle("landscape-fixed", Boolean(expanded && touch && width < height));
+    workspace.style.setProperty("--piano-long-side", Math.max(width, height) + "px");
+    workspace.style.setProperty("--piano-short-side", Math.min(width, height) + "px");
+  }
 
   async function closeExpanded() {
     if (!expanded) return;
     expanded = false;
     silence();
     workspace.classList.remove("expanded");
+    workspace.classList.remove("landscape-fixed");
     workspace.removeAttribute("role");
     workspace.removeAttribute("aria-modal");
     document.body.style.overflow = oldOverflow;
     span = oldSpan;
     renderKeyboard();
+    updateLandscape();
     el("piano-expand").textContent = "⛶ 放大 / 横屏";
     el("piano-screen-status").textContent = "";
     try { screen.orientation?.unlock?.(); } catch { /* Orientation may be browser-controlled. */ }
@@ -310,7 +364,7 @@ function sameEarAnswer(answer, expected) {
     if (expanded) return closeExpanded();
     expanded = true;
     oldSpan = span;
-    span = 24;
+    span = Math.max(24, span);
     returnFocus = document.activeElement;
     oldOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -318,19 +372,25 @@ function sameEarAnswer(answer, expected) {
     workspace.setAttribute("role", "dialog");
     workspace.setAttribute("aria-modal", "true");
     renderKeyboard();
+    updateLandscape();
     el("piano-expand").textContent = "退出放大";
     el("piano-expand").focus();
-    el("piano-screen-status").textContent = "已展开横屏布局，可旋转手机弹奏；电脑按 Esc 退出。";
+    el("piano-screen-status").textContent = "横屏布局已锁定，可横持手机弹奏；电脑按 Esc 退出。";
     if (workspace.requestFullscreen) {
       try {
         await workspace.requestFullscreen();
         nativeFullscreen = true;
+        updateLandscape();
         if (!expanded) { if (document.fullscreenElement === workspace) await document.exitFullscreen(); return; }
-        try { await screen.orientation?.lock?.("landscape"); } catch { /* CSS provides landscape layout where locking is unavailable. */ }
+        try { await screen.orientation?.lock?.("landscape"); } catch { /* Keep the page itself horizontal when device rotation is locked. */ }
+        if (!expanded) { try { screen.orientation?.unlock?.(); } catch {} return; }
+        updateLandscape();
       } catch { /* The expanded layout remains available without native fullscreen. */ }
     }
   });
   document.addEventListener("fullscreenchange", () => { if (nativeFullscreen && document.fullscreenElement !== workspace) void closeExpanded(); });
+  window.addEventListener("resize", updateLandscape);
+  window.visualViewport?.addEventListener("resize", updateLandscape);
   window.addEventListener("blur", silence);
   window.addEventListener("pagehide", silence);
   document.addEventListener("visibilitychange", () => { if (document.hidden) silence(); });
