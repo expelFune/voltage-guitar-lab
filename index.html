@@ -6,16 +6,17 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=clean-c">
+<link rel="stylesheet" href="style.css?v=tuner-1">
 <script src="music.js?v=clean-c" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=clean-c" defer></script>
+<script src="tuner.js?v=tuner-1" defer></script>
 </head>
 <body id="home">
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="#home"><span class="pick" aria-hidden="true">ϟ</span><span><strong>弦上实验室</strong><small>VOLTAGE GUITAR LAB</small></span></a>
-    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a></nav>
+    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a><a href="#tuner">调音器</a></nav>
     <span class="tuning"><i class="online"></i> E A D G B E</span>
   </div>
 </header>
@@ -144,6 +145,44 @@
         <label class="demo-toggle"><input id="practice-demo" type="checkbox" checked> 播放和弦示范</label>
         <button class="primary" id="metronome-button">▶ 开始练习</button>
         <span id="current-chord" class="hint" aria-live="off">准备就绪</span>
+      </div>
+    </div>
+  </section>
+  <section id="tuner" class="section" aria-labelledby="tuner-title">
+    <div class="section-heading"><div><div class="kicker">04 / TUNE &amp; LISTEN</div><h2 id="tuner-title">调音器与识音</h2></div><p>先调准，再开始弹。</p></div>
+    <div class="panel tuner-panel">
+      <div class="tuner-controls">
+        <div class="board-controls">
+          <label>模式 <select id="tuner-mode"><option value="guitar">吉他调音</option><option value="chromatic">自由识音</option></select></label>
+          <label>基准 A4 <input id="tuner-reference" type="number" min="430" max="450" step="1" value="440"> Hz</label>
+        </div>
+        <div id="tuner-guitar">
+          <label class="input-label" for="tuner-preset">调音目标（6 → 1 弦）</label>
+          <select id="tuner-preset"></select>
+          <form id="tuner-custom" class="progression-editor" hidden>
+            <label class="input-label" for="tuner-notes">从粗弦到细弦，填入六个带八度的音名</label>
+            <div class="symbol-entry"><input id="tuner-notes" type="text" maxlength="70" value="E2 A2 D3 G3 B3 E4" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="tuner-custom-status"><button class="secondary" type="submit">应用</button></div>
+            <p id="tuner-custom-status" class="input-status" role="status"></p>
+          </form>
+          <div id="tuner-strings" class="tuner-strings" role="group" aria-label="锁定要调的弦"></div>
+          <button id="tuner-auto" class="secondary" aria-pressed="true">自动匹配最近目标</button>
+          <p class="hint">点击弦号可锁定目标，适合相差较大的音。点“自动匹配”恢复自动选弦。</p>
+        </div>
+        <p class="hint">一次弹一根弦，等声音稳定后读数。自由识音会显示单音的音名和八度。</p>
+        <button id="tuner-start" class="primary">开启麦克风</button>
+        <p id="tuner-status" class="input-status" role="status">点击后允许麦克风。音频在本机即时分析。</p>
+      </div>
+      <div id="tuner-display" class="tuner-display">
+        <div class="kicker">LIVE PITCH</div>
+        <div id="tuner-note" class="tuner-note">—</div>
+        <div id="tuner-frequency" class="tuner-frequency">等待单音</div>
+        <div id="tuner-target" class="hint">自动匹配最近的空弦目标</div>
+        <div class="tuner-meter" role="meter" aria-label="相对目标的音分偏差" aria-valuemin="-50" aria-valuemax="50" aria-valuenow="0" id="tuner-meter">
+          <div class="tuner-center"></div><div id="tuner-needle" class="tuner-needle" hidden></div>
+          <span>−50</span><span>0</span><span>+50</span>
+        </div>
+        <strong id="tuner-direction" class="tuner-direction">等待拨弦</strong>
+        <p class="hint">偏低时调高，偏高时调低；绿色表示偏差在 ±5 音分内。</p>
       </div>
     </div>
   </section>

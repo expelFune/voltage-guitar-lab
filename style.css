@@ -162,6 +162,28 @@ input[type=range],input[type=checkbox]{accent-color:var(--lime)}
 .beats span{background:#282438;border:1px solid #483c59;border-radius:7px;min-width:32px;text-align:center;padding:4px;color:#d5c8ed;font-family:var(--mono)}
 .beats .active{background:var(--lime);color:#222719;border-color:var(--lime)}
 .demo-toggle{font-size:12px;color:var(--muted)}
+.tuner-panel{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px}
+.tuner-controls{min-width:0;display:grid;align-content:start;gap:12px}
+#tuner-reference{width:69px;min-height:36px;border:1px solid #4a415b;border-radius:7px;background:#262237;color:var(--ink);padding:5px 7px}
+#tuner-preset{display:block;width:100%;margin-top:5px;font-size:12px;white-space:normal}
+.tuner-strings{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:12px 0 8px}
+.tuner-strings button{display:grid;gap:4px;justify-items:center;min-width:0;padding:8px 3px}
+.tuner-strings small{font-size:10px;color:var(--muted)}
+.tuner-strings b{font:700 14px var(--mono)}
+.tuner-strings button[aria-pressed=true]{border-color:var(--lime)}
+.tuner-strings button.matched{background:#39402a;color:var(--lime)}
+.tuner-controls .hint{margin-top:7px}
+.tuner-display{display:grid;justify-items:center;align-content:center;gap:7px;border:1px solid #4b405e;border-radius:12px;padding:23px 14px;background:radial-gradient(ellipse at 50% 35%,#31273d,#191a27 78%)}
+.tuner-note{font:800 clamp(64px,8vw,100px)/1.1 var(--mono);color:#f7d99a}
+.tuner-frequency{font:12px/1.5 var(--mono);color:var(--muted);text-align:center}
+.tuner-display .hint{text-align:center}
+.tuner-meter{position:relative;display:flex;justify-content:space-between;align-items:end;width:90%;height:64px;padding:0 0 1px;margin:4px 0 2px;color:var(--muted);font:10px var(--mono);background:repeating-linear-gradient(90deg,transparent 0,transparent calc(10% - 1px),#7a6d853b calc(10% - 1px),#7a6d853b 10%) center 9px/100% 29px no-repeat}
+.tuner-meter::before{content:"";position:absolute;left:5%;right:5%;top:9px;height:28px;border-top:1px solid #81708d;border-bottom:1px solid #81708d}
+.tuner-center{position:absolute;left:45.5%;width:9%;height:32px;top:7px;background:#d8fb7c20;border:1px solid #d8fb7c70;border-radius:4px}
+.tuner-needle{position:absolute;top:2px;left:50%;height:42px;width:3px;background:#ffcf82;transform:translateX(-50%);box-shadow:0 0 10px #ffcf8240;transition:left .1s linear}
+.tuner-direction{color:#ffcf82;font-size:15px;min-height:24px;text-align:center}
+.tuner-display.in-tune .tuner-note,.tuner-display.in-tune .tuner-direction{color:var(--lime)}
+.tuner-display.in-tune .tuner-needle{background:var(--lime)}
 footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;border-top:1px solid var(--line);padding:15px 0;color:var(--muted);font:10px/1.5 var(--mono)}
 .toast{position:fixed;right:14px;bottom:14px;z-index:15;background:#35294b;border:1px solid #7f68a4;color:white;padding:9px 12px;border-radius:8px;font-size:13px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -175,10 +197,12 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
   .fret,.string-label{height:44px}.fret span{height:25px}.fretboard{font-size:12px}
   .section-heading{align-items:flex-end}.section-heading p{font-size:11px;text-align:right}
   .practice-panel{grid-template-columns:minmax(0,1fr)}.metronome{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}
+  .tuner-panel{grid-template-columns:minmax(0,1fr);gap:14px}
+  .tuner-display{grid-row:1}
   .voicing-layout{grid-template-columns:minmax(0,1fr)}
   .voicing-layout .neck-stage{grid-row:1;max-width:340px;justify-self:center}
   .practice-stage{max-width:340px;order:1}
   .symbol-entry input{font-size:16px}
   .measure-actions button,.secondary,.primary,select,.small-button{min-height:40px}.measure-actions button{min-width:34px}.shape-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}.tuner-needle{transition:none}}
