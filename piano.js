@@ -15,7 +15,10 @@ function sameEarAnswer(answer, expected) {
 
 (() => {
   const el = (id) => document.getElementById(id);
-  const workspace = el("piano-workspace"), board = el("piano-keys");
+  const workspace = el("piano-workspace"), board = el("piano-keys"), scroll = el("piano-scroll"), overlay = el("piano-overlay");
+  const whiteNotes = Array.from({length:85}, (_,i) => 24+i).filter((midi) => [0,2,4,5,7,9,11].includes(mod(midi)));
+  const originalPosition = document.createComment("piano-home");
+  workspace.parentNode.insertBefore(originalPosition, workspace);
   const keyCodes = ["KeyA","KeyW","KeyS","KeyE","KeyD","KeyF","KeyT","KeyG","KeyY","KeyH","KeyU","KeyJ","KeyK","KeyO","KeyL","KeyP","Semicolon"];
   const whitePitchClasses = [0,2,4,5,7,9,11];
   const owners = new Map(), held = new Map(), pointers = new Set(), allVoices = new Set(), auditionVoices = new Set();
@@ -23,6 +26,8 @@ function sameEarAnswer(answer, expected) {
   let target = null, guesses = new Set(), revealed = false, answered = 0, correct = 0, auditionEpoch = 0;
   let expanded = false, nativeFullscreen = false, oldOverflow = "", oldSpan, returnFocus;
   let keyWidth = 42;
+  let savedKeyWidth, savedScroll, scrollFrame, panPointer, panStart, panScroll;
+  const useTouchEvents = "ontouchstart" in window || navigator.maxTouchPoints > 0;
   const noteName = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
   async function ensureAudio() {
@@ -83,7 +88,7 @@ function sameEarAnswer(answer, expected) {
     board.querySelectorAll("[data-piano-midi]").forEach((key) => {
       const midi = Number(key.dataset.pianoMidi);
       key.classList.toggle("pressed", held.has(midi));
-      key.classList.toggle("answer-selected", Boolean(target && !revealed && guesses.has(mod(midi))));
+      key.classList.toggle("answer-selected", Boolean(target && !revealed && guesses.has(answerValue(midi))));
     });
     el("piano-note").textContent = held.size ? [...held.keys()].sort((a,b) => a-b).map(noteName).join(" ＋ ") : "点琴键开始弹奏";
   }
@@ -107,7 +112,7 @@ function sameEarAnswer(answer, expected) {
     }
     entry.owners.add(owner);
     highlight();
-    chooseAnswer(mod(midi));
+    chooseAnswer(answerValue(midi));
     if (!await ensureAudio() || held.get(midi) !== entry || entry.owners.size === 0) return;
     if (!entry.sound) entry.sound = voice(midi, context.currentTime + .005);
   }
@@ -137,10 +142,7 @@ function sameEarAnswer(answer, expected) {
 
   function renderKeyboard() {
     silence();
-    const previousBase = base;
-    base = Math.max(24, Math.min(108 - span, base));
-    if (base !== previousBase) clearQuestion();
-    const startNotes = Array.from({ length: Math.floor((108 - span - 24) / 12) + 1 }, (_, i) => 24 + i * 12);
+    const startNotes = Array.from({ length: 7 }, (_, i) => 24 + i * 12);
     el("piano-octave").replaceChildren(...startNotes.map((midi) => {
       const option = document.createElement("option");
       option.value = midi;
@@ -148,18 +150,14 @@ function sameEarAnswer(answer, expected) {
       return option;
     }));
     el("piano-octave").value = base;
-    el("piano-range").max = 108 - span;
-    el("piano-range").value = base;
-    el("piano-range-label").textContent = noteName(base) + " — " + noteName(base + span);
-    el("piano-range-down").disabled = base === 24;
-    el("piano-range-up").disabled = base === 108 - span;
-    const notes = Array.from({ length: span + 1 }, (_, index) => base + index);
-    const whiteCount = notes.filter((note) => whitePitchClasses.includes(mod(note))).length;
+    const notes = Array.from({ length: 85 }, (_, index) => 24 + index);
+    const whiteCount = whiteNotes.length;
     let whites = 0;
     board.style.setProperty("--piano-whites", whiteCount);
     board.style.setProperty("--piano-key-width", keyWidth + "px");
     board.dataset.whites = whiteCount;
     board.style.minWidth = (whiteCount * keyWidth) + "px";
+    board.style.width = (whiteCount * keyWidth) + "px";
     board.replaceChildren(...notes.map((midi) => {
       const black = !whitePitchClasses.includes(mod(midi)), key = document.createElement("button"), offset = midi - base;
       key.type = "button";
@@ -183,7 +181,47 @@ function sameEarAnswer(answer, expected) {
     highlight();
   }
 
+  function updateScroll() {
+    const max = Math.max(0, scroll.scrollWidth - scroll.clientWidth);
+    const position = Math.max(0, Math.min(max, scroll.scrollLeft));
+    const viewport = scroll.clientWidth || workspace.clientWidth || 600;
+    el("piano-range").value = max ? position / max * 1000 : 0;
+    const first = whiteNotes[Math.max(0, Math.min(49, Math.floor(position / keyWidth)))];
+    const last = whiteNotes[Math.max(0, Math.min(49, Math.floor((position + viewport - 1) / keyWidth)))];
+    el("piano-range-label").textContent = noteName(first) + " — " + noteName(last);
+    el("piano-range-down").disabled = scroll.scrollLeft < 1;
+    el("piano-range-up").disabled = scroll.scrollLeft >= max - 1;
+    base = Math.max(24, Math.min(96, Math.floor(first / 12) * 12));
+    el("piano-octave").value = base;
+    board.querySelectorAll("[data-piano-midi]").forEach((key) => {
+      const code = keyCodes[Number(key.dataset.pianoMidi) - base];
+      key.querySelector("small").textContent = code ? code.replace("Key","").replace("Semicolon",";") : "";
+    });
+  }
+  scroll.addEventListener("scroll", () => {
+    cancelAnimationFrame(scrollFrame);
+    scrollFrame = requestAnimationFrame(updateScroll);
+  });
+  function setKeyWidth(width) {
+    const anchor = scroll.scrollLeft / keyWidth;
+    keyWidth = Math.max(8, Math.min(120, width));
+    board.style.setProperty("--piano-key-width", keyWidth + "px");
+    board.style.minWidth = board.style.width = (whiteNotes.length * keyWidth) + "px";
+    scroll.scrollLeft = anchor * keyWidth;
+    el("piano-zoom-label").textContent = "键宽 " + Math.round(keyWidth) + "px";
+    el("piano-zoom-out").disabled = keyWidth <= 8;
+    el("piano-zoom-in").disabled = keyWidth >= 120;
+    updateScroll();
+  }
+  function fitView() { setKeyWidth((scroll.clientWidth || workspace.clientWidth || 600) / (span / 12 * 7 + 1)); }
+  function jumpTo(midi) {
+    const index = whiteNotes.findIndex((note) => note >= midi);
+    scroll.scrollLeft = Math.max(0, index) * keyWidth;
+    updateScroll();
+  }
+
   board.addEventListener("pointerdown", (event) => {
+    if (useTouchEvents && event.pointerType === "touch") return;
     if (event.button !== 0) return;
     const key = event.target.closest("[data-piano-midi]");
     if (!key || !board.contains(key)) return;
@@ -207,6 +245,30 @@ function sameEarAnswer(answer, expected) {
     if (board.hasPointerCapture(event.pointerId)) board.releasePointerCapture(event.pointerId);
   }
   for (const type of ["pointerup","pointercancel","lostpointercapture"]) board.addEventListener(type, releasePointer);
+  function touchKey(touch) {
+    const key = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("[data-piano-midi]");
+    return key && board.contains(key) ? Number(key.dataset.pianoMidi) : undefined;
+  }
+  board.addEventListener("touchstart", (event) => {
+    event.preventDefault();
+    for (const touch of Array.from(event.changedTouches)) {
+      const midi = touchKey(touch);
+      if (midi !== undefined) void press("touch-" + touch.identifier, midi);
+    }
+  }, { passive: false });
+  board.addEventListener("touchmove", (event) => {
+    event.preventDefault();
+    for (const touch of Array.from(event.changedTouches)) {
+      const owner = "touch-" + touch.identifier, midi = touchKey(touch);
+      if (owners.get(owner) === midi) continue;
+      release(owner);
+      if (midi !== undefined) void press(owner, midi);
+    }
+  }, { passive: false });
+  for (const type of ["touchend","touchcancel"]) board.addEventListener(type, (event) => {
+    event.preventDefault();
+    for (const touch of Array.from(event.changedTouches)) release("touch-" + touch.identifier);
+  }, { passive: false });
 
   document.addEventListener("keydown", (event) => {
     if (expanded && event.key === "Escape") { event.preventDefault(); void closeExpanded(); return; }
@@ -219,7 +281,7 @@ function sameEarAnswer(answer, expected) {
     }
     if (!el("piano-computer").checked || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.target.closest('input,textarea,select,[contenteditable="true"]')) return;
     const index = keyCodes.indexOf(event.code);
-    if (index < 0 || index > span) return;
+    if (index < 0 || base + index > 108) return;
     event.preventDefault();
     void press("keyboard-" + event.code, base + index);
   });
@@ -237,14 +299,23 @@ function sameEarAnswer(answer, expected) {
     renderAnswerButtons();
     silence();
   }
-  function pool() { return el("ear-pool").value === "white" ? whitePitchClasses : Array.from({length:12}, (_,i) => i); }
+  function answerValue(midi) { return el("ear-octave-answer").checked ? midi : mod(midi); }
+  function earPool() {
+    const length = Number(el("ear-span").value);
+    const first = Math.max(24, Math.min(108 - length, Number(el("ear-start").value)));
+    el("ear-start").value = first;
+    el("ear-range-hint").textContent = "出题音域 " + noteName(first) + " — " + noteName(first + length - 1)
+      + (el("ear-octave-answer").checked ? "，答案区分八度。" : "，只判断音名。") + " 多个音不分顺序，可点钢琴或音名作答。";
+    return Array.from({length}, (_,i) => first + i).filter((midi) => el("ear-pool").value !== "white" || whitePitchClasses.includes(mod(midi)));
+  }
   function renderAnswerButtons() {
-    el("ear-answers").replaceChildren(...pool().map((pitch) => {
+    const values = [...new Set(earPool().map(answerValue))];
+    el("ear-answers").replaceChildren(...values.map((pitch) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "secondary";
       button.dataset.pitch = pitch;
-      button.textContent = roots[pitch];
+      button.textContent = el("ear-octave-answer").checked ? noteName(pitch) : roots[pitch];
       button.setAttribute("aria-pressed", String(guesses.has(pitch)));
       button.addEventListener("click", () => chooseAnswer(pitch));
       return button;
@@ -262,14 +333,19 @@ function sameEarAnswer(answer, expected) {
       auditionVoices.add(voice(Number(el("ear-reference").value), start, .65));
       start += 1;
     }
-    question.forEach((pitch, index) => {
+    question.forEach((midi, index) => {
       const delay = el("ear-order").value === "sequence" ? index * .7 : 0;
-      auditionVoices.add(voice(base + pitch, start + delay, .8));
+      auditionVoices.add(voice(midi, start + delay, .8));
     });
   }
   el("ear-new").addEventListener("click", () => {
     silence();
-    target = makeEarQuestion(pool(), Number(el("ear-count").value));
+    const available = earPool(), count = Number(el("ear-count").value);
+    target = el("ear-octave-answer").checked ? makeEarQuestion(available, count)
+      : makeEarQuestion([...new Set(available.map(modNote => mod(modNote)))], count).map((pitch) => {
+        const candidates = available.filter((midi) => mod(midi) === pitch);
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      });
     guesses.clear();
     revealed = false;
     renderAnswerButtons();
@@ -294,51 +370,59 @@ function sameEarAnswer(answer, expected) {
       el("ear-status").textContent = "这题有 " + target.length + " 个音，请选满后再提交。";
       return;
     }
-    const right = sameEarAnswer(guesses, target);
+    const right = sameEarAnswer(guesses, target.map(answerValue));
     revealed = true;
     answered++;
     if (!showOnly && right) correct++;
-    el("ear-status").textContent = (showOnly ? "答案是 " : right ? "答对了！" : "再听听这些音：") + target.map((pitch) => roots[pitch]).join(" · ");
+    el("ear-status").textContent = (showOnly ? "答案是 " : right ? "答对了！" : "再听听这些音：") + target.map((midi) => el("ear-octave-answer").checked ? noteName(midi) : roots[mod(midi)]).join(" · ");
     el("ear-score").textContent = "已答 " + answered + " 题 · 答对 " + correct + " 题";
     el("ear-submit").disabled = el("ear-reveal").disabled = true;
     highlight();
   }
   el("ear-submit").addEventListener("click", () => finish(false));
   el("ear-reveal").addEventListener("click", () => finish(true));
-  for (const id of ["ear-count","ear-pool","ear-order"]) el(id).addEventListener("change", clearQuestion);
+  for (const id of ["ear-count","ear-pool","ear-order","ear-start","ear-span","ear-octave-answer"]) el(id).addEventListener("change", clearQuestion);
   el("ear-give-reference").addEventListener("change", () => { auditionEpoch++; for (const sound of auditionVoices) sound.stop(true); auditionVoices.clear(); });
-  function changeRange(nextBase, nextSpan = span) {
-    const previousBase = base;
-    span = nextSpan;
-    base = Math.max(24, Math.min(108 - span, nextBase));
-    if (base !== previousBase) clearQuestion();
-    renderKeyboard();
-    el("piano-scroll").scrollLeft = 0;
-  }
-  el("piano-octave").addEventListener("change", () => changeRange(Number(el("piano-octave").value)));
-  el("piano-span").addEventListener("change", () => changeRange(base, Number(el("piano-span").value)));
-  el("piano-range").addEventListener("input", () => changeRange(Number(el("piano-range").value)));
-  el("piano-range-down").addEventListener("click", () => changeRange(base - 12));
-  el("piano-range-up").addEventListener("click", () => changeRange(base + 12));
+  el("piano-octave").addEventListener("change", () => jumpTo(Number(el("piano-octave").value)));
+  el("piano-span").addEventListener("change", () => { span = Number(el("piano-span").value); fitView(); });
+  el("piano-range").addEventListener("input", () => {
+    scroll.scrollLeft = Number(el("piano-range").value) / 1000 * Math.max(0, scroll.scrollWidth - scroll.clientWidth);
+    updateScroll();
+  });
+  el("piano-range-down").addEventListener("click", () => { scroll.scrollLeft = Math.max(0, scroll.scrollLeft - keyWidth * 7); updateScroll(); });
+  el("piano-range-up").addEventListener("click", () => { scroll.scrollLeft = Math.min(scroll.scrollWidth - scroll.clientWidth, scroll.scrollLeft + keyWidth * 7); updateScroll(); });
+  const pan = el("piano-pan");
+  const panCoordinate = (event) => workspace.classList.contains("landscape-fixed") ? event.clientY : event.clientX;
+  pan.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || panPointer !== undefined) return;
+    event.preventDefault();
+    panPointer = event.pointerId;
+    panStart = panCoordinate(event);
+    panScroll = scroll.scrollLeft;
+    pan.setPointerCapture(panPointer);
+  });
+  pan.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== panPointer) return;
+    scroll.scrollLeft = panScroll - (panCoordinate(event) - panStart);
+    updateScroll();
+  });
+  for (const type of ["pointerup","pointercancel","lostpointercapture"]) pan.addEventListener(type, (event) => {
+    if (event.pointerId !== panPointer) return;
+    panPointer = undefined;
+    if (pan.hasPointerCapture(event.pointerId)) pan.releasePointerCapture(event.pointerId);
+  });
   function zoom(direction) {
-    const oldWidth = keyWidth, scroll = el("piano-scroll");
-    keyWidth = Math.max(24, Math.min(96, keyWidth + direction * 6));
-    board.style.setProperty("--piano-key-width", keyWidth + "px");
-    board.style.minWidth = (Number(board.dataset.whites) * keyWidth) + "px";
-    scroll.scrollLeft *= keyWidth / oldWidth;
-    el("piano-zoom-label").textContent = "键宽 " + keyWidth + "px";
-    el("piano-zoom-out").disabled = keyWidth === 24;
-    el("piano-zoom-in").disabled = keyWidth === 96;
+    setKeyWidth(keyWidth + direction * 6);
   }
   el("piano-zoom-out").addEventListener("click", () => zoom(-1));
   el("piano-zoom-in").addEventListener("click", () => zoom(1));
   function updateLandscape() {
-    const width = window.visualViewport?.width || window.innerWidth;
-    const height = window.visualViewport?.height || window.innerHeight;
-    const touch = matchMedia("(pointer:coarse)").matches || navigator.maxTouchPoints > 0;
-    workspace.classList.toggle("landscape-fixed", Boolean(expanded && touch && width < height));
+    const width = (expanded && overlay.clientWidth) || window.visualViewport?.width || window.innerWidth;
+    const height = (expanded && overlay.clientHeight) || window.visualViewport?.height || window.innerHeight;
+    workspace.classList.toggle("landscape-fixed", Boolean(expanded && width < height));
     workspace.style.setProperty("--piano-long-side", Math.max(width, height) + "px");
     workspace.style.setProperty("--piano-short-side", Math.min(width, height) + "px");
+    updateScroll();
   }
 
   async function closeExpanded() {
@@ -351,12 +435,16 @@ function sameEarAnswer(answer, expected) {
     workspace.removeAttribute("aria-modal");
     document.body.style.overflow = oldOverflow;
     span = oldSpan;
-    renderKeyboard();
+    if (document.fullscreenElement === overlay) await document.exitFullscreen().catch(() => {});
+    originalPosition.parentNode.insertBefore(workspace, originalPosition.nextSibling);
+    overlay.hidden = true;
+    el("piano-span").value = span;
+    setKeyWidth(savedKeyWidth);
+    scroll.scrollLeft = savedScroll;
     updateLandscape();
     el("piano-expand").textContent = "⛶ 放大 / 横屏";
     el("piano-screen-status").textContent = "";
     try { screen.orientation?.unlock?.(); } catch { /* Orientation may be browser-controlled. */ }
-    if (document.fullscreenElement === workspace) await document.exitFullscreen().catch(() => {});
     nativeFullscreen = false;
     returnFocus?.focus();
   }
@@ -364,31 +452,36 @@ function sameEarAnswer(answer, expected) {
     if (expanded) return closeExpanded();
     expanded = true;
     oldSpan = span;
+    savedKeyWidth = keyWidth;
+    savedScroll = scroll.scrollLeft;
     span = Math.max(24, span);
     returnFocus = document.activeElement;
     oldOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    overlay.hidden = false;
+    overlay.append(workspace);
     workspace.classList.add("expanded");
     workspace.setAttribute("role", "dialog");
     workspace.setAttribute("aria-modal", "true");
-    renderKeyboard();
     updateLandscape();
+    fitView();
+    el("piano-span").value = span;
     el("piano-expand").textContent = "退出放大";
     el("piano-expand").focus();
     el("piano-screen-status").textContent = "横屏布局已锁定，可横持手机弹奏；电脑按 Esc 退出。";
-    if (workspace.requestFullscreen) {
+    if (overlay.requestFullscreen) {
       try {
-        await workspace.requestFullscreen();
+        await overlay.requestFullscreen();
         nativeFullscreen = true;
         updateLandscape();
-        if (!expanded) { if (document.fullscreenElement === workspace) await document.exitFullscreen(); return; }
+        if (!expanded) { if (document.fullscreenElement === overlay) await document.exitFullscreen(); return; }
         try { await screen.orientation?.lock?.("landscape"); } catch { /* Keep the page itself horizontal when device rotation is locked. */ }
         if (!expanded) { try { screen.orientation?.unlock?.(); } catch {} return; }
         updateLandscape();
       } catch { /* The expanded layout remains available without native fullscreen. */ }
     }
   });
-  document.addEventListener("fullscreenchange", () => { if (nativeFullscreen && document.fullscreenElement !== workspace) void closeExpanded(); });
+  document.addEventListener("fullscreenchange", () => { if (nativeFullscreen && document.fullscreenElement !== overlay) void closeExpanded(); });
   window.addEventListener("resize", updateLandscape);
   window.visualViewport?.addEventListener("resize", updateLandscape);
   window.addEventListener("blur", silence);
@@ -396,5 +489,7 @@ function sameEarAnswer(answer, expected) {
   document.addEventListener("visibilitychange", () => { if (document.hidden) silence(); });
   el("piano-span").value = span;
   renderKeyboard();
+  fitView();
+  jumpTo(60);
   renderAnswerButtons();
 })();

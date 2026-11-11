@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=piano-mobile-2">
+<link rel="stylesheet" href="style.css?v=piano-smooth">
 <script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=chord-builder" defer></script>
-<script src="piano.js?v=piano-mobile-2" defer></script>
+<script src="piano.js?v=piano-smooth" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
 <body id="home">
@@ -200,7 +200,8 @@
         </div>
         <div class="piano-readout"><strong id="piano-note">点琴键开始弹奏</strong><label class="demo-toggle"><input type="checkbox" id="piano-computer" checked> 电脑键盘映射</label></div>
         <p class="hint piano-help">电脑用 A W S E D F T G Y H U J K O L P ; 弹奏。手机可多指同弹，放大后固定横向布局；音域较宽时可拖动音域条或琴键上方空白处。</p>
-        <div class="piano-range-strip"><button id="piano-range-down" class="small-button" type="button" aria-label="降低一个八度">‹</button><label for="piano-range">滑动选音域 <output id="piano-range-label">C4 — C6</output></label><input id="piano-range" type="range" min="24" max="84" step="12" value="60"><button id="piano-range-up" class="small-button" type="button" aria-label="提高一个八度">›</button></div>
+        <div class="piano-range-strip"><button id="piano-range-down" class="small-button" type="button" aria-label="向低音移动">‹</button><label for="piano-range">连续滑动音域 <output id="piano-range-label">C4 — C6</output></label><input id="piano-range" type="range" min="0" max="1000" step="1" value="0"><button id="piano-range-up" class="small-button" type="button" aria-label="向高音移动">›</button></div>
+        <div id="piano-pan" class="piano-pan">⇠ 在这里拖动，可停在任意位置 ⇢</div>
         <div id="piano-scroll" class="piano-scroll" tabindex="0" aria-label="钢琴键盘，较宽时可横向滚动"><div id="piano-keys" class="piano-keys" role="group" aria-label="可弹奏琴键"></div></div>
         <p id="piano-screen-status" class="hint" role="status"></p>
       </div>
@@ -209,12 +210,15 @@
         <div class="board-controls">
           <label>题目 <select id="ear-count"><option value="1">一个音</option><option value="2">两个音</option><option value="3">三个音</option></select></label>
           <label>范围 <select id="ear-pool"><option value="white">C 大调 · 白键</option><option value="chromatic">十二半音 · 含黑键</option></select></label>
+          <label>最低音区 <select id="ear-start"><option value="24">C1</option><option value="36">C2</option><option value="48">C3</option><option value="60" selected>C4</option><option value="72">C5</option><option value="84">C6</option><option value="96">C7</option></select></label>
+          <label>出题音域 <select id="ear-span"><option value="12">1 组八度</option><option value="24">2 组八度</option><option value="36">3 组八度</option><option value="48">4 组八度</option><option value="60">5 组八度</option><option value="72">6 组八度</option><option value="84">7 组八度</option></select></label>
+          <label class="demo-toggle"><input type="checkbox" id="ear-octave-answer" checked> 答案区分八度</label>
           <label>多音播放 <select id="ear-order"><option value="together">同时弹奏</option><option value="sequence">依次弹奏</option></select></label>
           <label class="demo-toggle"><input type="checkbox" id="ear-give-reference" checked> 先给标准音</label>
           <label>标准音 <select id="ear-reference"><option value="60">C4 · 中央 C</option><option value="69">A4 · 440 Hz</option></select></label>
         </div>
         <div class="actions"><button type="button" id="ear-new" class="primary">开始 / 下一题</button><button type="button" id="ear-replay" class="secondary" disabled>再听一遍</button><button type="button" id="ear-standard" class="secondary">听标准音</button></div>
-        <p class="hint">题目使用当前起始音区内的一个八度。点击钢琴或下方音名选答案，再点一次可取消；只判断音名，多个音不分顺序。</p>
+        <p class="hint" id="ear-range-hint">题目使用所选音域。点击钢琴或下方音名作答，再点一次取消；多个音不分顺序。</p>
         <div id="ear-answers" class="ear-answers" role="group" aria-label="选择听到的音名"></div>
         <div class="actions"><button type="button" id="ear-submit" class="primary" disabled>提交答案</button><button type="button" id="ear-reveal" class="secondary" disabled>显示答案</button><span id="ear-score" class="hint">已答 0 题 · 答对 0 题</span></div>
         <p id="ear-status" class="input-status" role="status">点“开始 / 下一题”，听完后选择你听到的音。</p>
@@ -224,5 +228,6 @@
   <footer><span>ϟ　弦上实验室</span><span>STANDARD TUNING / EADGBE</span></footer>
 </main>
 <div id="toast" class="toast" role="status" hidden></div>
+<div id="piano-overlay" class="piano-overlay" hidden></div>
 </body>
 </html>
