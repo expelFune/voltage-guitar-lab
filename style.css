@@ -76,10 +76,6 @@ select{max-width:100%}
 .fret{touch-action:none;user-select:none;-webkit-user-select:none}
 .fret.held{background:#574273}
 .fret.held span{outline:2px solid #fff;outline-offset:2px;box-shadow:0 0 12px #d8fb7c88}
-.chord-builder{border:1px solid #4b405e;background:#211e2e;border-radius:10px;padding:12px;margin:12px 0}
-.builder-result{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0}
-.builder-result strong{color:var(--lime);font-size:18px}
-.builder-result .tones{margin-right:5px}
 .board-caption{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;margin:7px 0;font-size:12px;color:var(--muted)}
 .board-caption strong{color:var(--lime);font-weight:600}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 0;background:var(--lime)}
@@ -197,12 +193,40 @@ input[type=range],input[type=checkbox]{accent-color:var(--lime)}
 .tuner-display.in-tune .tuner-note,.tuner-display.in-tune .tuner-direction{color:var(--lime)}
 .tuner-display.in-tune .tuner-needle{background:var(--lime)}
 footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;border-top:1px solid var(--line);padding:15px 0;color:var(--muted);font:10px/1.5 var(--mono)}
+.piano-workspace{background:#181722;border:1px solid #4b405e;border-radius:12px;padding:14px;min-width:0}
+.piano-toolbar,.piano-readout{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.piano-toolbar .board-controls{margin:0}
+.piano-readout{margin:11px 0 5px;min-height:25px}
+.piano-readout strong{color:var(--lime);font-size:14px}
+.piano-help{margin-bottom:9px}
+.piano-scroll{overflow-x:auto;padding:14px 0;scrollbar-color:#76628d #252130;overscroll-behavior-inline:contain;touch-action:pan-x}
+.piano-keys{position:relative;display:flex;width:100%;min-width:calc(var(--piano-whites) * 36px);isolation:isolate;user-select:none;-webkit-user-select:none}
+.piano-key{border-radius:0 0 7px 7px;touch-action:none;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding:0 1px 10px;flex:none;font:11px var(--mono);transition:background .05s;min-width:0}
+.piano-key.white{width:calc(100% / var(--piano-whites));height:210px;background:linear-gradient(90deg,#ddd8e4,#fbf9ff 16%,#f1edf7 84%,#d2cadb);border:1px solid #aea3bb;color:#362a44;box-shadow:0 5px 0 #9b90ab}
+.piano-key.black{position:absolute;z-index:2;top:0;width:calc(100% / var(--piano-whites) * .62);height:132px;transform:translateX(-50%);background:linear-gradient(90deg,#14131b,#34303f 48%,#14131b);border:1px solid #09080c;color:#e4d9f2;box-shadow:0 5px 0 #08070b}
+.piano-key small{opacity:.65;font-size:10px}
+.piano-key.answer-selected.white{background:#d9c8f7}
+.piano-key.answer-selected.black{background:#69528b}
+.piano-key.pressed.white{background:linear-gradient(#e6ffad,#b7df68);box-shadow:0 2px 0 #789b3d;transform:translateY(3px)}
+.piano-key.pressed.black{background:linear-gradient(#c9ef91,#86a750);box-shadow:0 2px 0 #586d35;color:#20271a}
+.piano-key:focus-visible{outline:3px solid var(--violet);outline-offset:-4px}
+.ear-training{border-top:1px solid var(--line);margin-top:20px;padding-top:17px;display:grid;gap:12px}
+.ear-training .board-controls{margin:0}
+.ear-answers{display:flex;gap:6px;flex-wrap:wrap}
+.ear-answers button{min-width:44px}
+.ear-answers button[aria-pressed=true]{background:var(--lime);color:#242c19;border-color:var(--lime)}
+.piano-workspace.expanded{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;width:100vw;width:100dvw;height:100vh;height:100dvh;background:#15141f;border:0;border-radius:0;padding:clamp(10px,3vw,28px);overflow:auto}
+.piano-workspace.expanded .piano-scroll{flex:1;min-height:160px;align-content:center}
+.piano-workspace.expanded .piano-key.white{height:clamp(125px,45vmin,310px)}
+.piano-workspace.expanded .piano-key.black{height:clamp(80px,28vmin,195px)}
+.piano-workspace.expanded .piano-key{font-size:12px}
+@media(orientation:portrait) and (max-width:700px){.piano-workspace.expanded{inset:auto;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;height:100dvw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center}}
 .toast{position:fixed;right:14px;bottom:14px;z-index:15;background:#35294b;border:1px solid #7f68a4;color:white;padding:9px 12px;border-radius:8px;font-size:13px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:720px){.tuning{display:none}.shape-list{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}.key-panel{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){
   html{scroll-padding-top:102px}.header-inner{flex-wrap:wrap;justify-content:center;gap:1px;padding-block:5px}.brand{flex-basis:100%;justify-content:center}.brand small{display:none}.pick{width:24px;height:25px;font-size:18px}
-  nav{justify-content:center;width:100%;gap:4px}nav a{padding:5px 9px;min-height:32px}
+  nav{justify-content:center;width:100%;gap:2px;flex-wrap:wrap}nav a{padding:5px 6px;min-height:32px;font-size:12px}
   main{padding-top:11px}.intro{padding:12px 13px 15px;min-height:230px}.intro img{width:90%;height:100px;right:0;top:auto;bottom:2px}.intro-index{display:none}
   .section{margin-top:15px}.panel-heading{align-items:flex-end;gap:5px;margin-bottom:10px}h2{font-size:22px}.segmented button{padding:5px 6px;font-size:12px}
   .board-controls{gap:7px 9px}.board-controls label{min-width:0}.board-controls select{min-width:0;max-width:min(56vw,230px)}
@@ -215,6 +239,10 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
   .voicing-layout .neck-stage{grid-row:1;max-width:340px;justify-self:center}
   .practice-stage{max-width:340px;order:1}
   .symbol-entry input{font-size:16px}
+  .piano-workspace{padding:10px}
+  .piano-toolbar .board-controls{gap:6px}
+  .piano-key.white{height:175px}
+  .piano-key.black{height:112px}
   .measure-actions button,.secondary,.primary,select,.small-button{min-height:40px}.measure-actions button{min-width:34px}.shape-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}.tuner-needle,#tuner-input-fill{transition:none}}

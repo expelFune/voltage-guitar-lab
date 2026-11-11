@@ -6,18 +6,18 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=chord-builder">
+<link rel="stylesheet" href="style.css?v=piano-1">
 <script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=chord-builder" defer></script>
-<script src="builder.js?v=chord-builder" defer></script>
+<script src="piano.js?v=piano-1" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
 <body id="home">
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="#home"><span class="pick" aria-hidden="true">ϟ</span><span><strong>弦上实验室</strong><small>VOLTAGE GUITAR LAB</small></span></a>
-    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a><a href="#tuner">调音器</a></nav>
+    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a><a href="#tuner">调音器</a><a href="#piano">钢琴练耳</a></nav>
     <span class="tuning"><i class="online"></i> E A D G B E</span>
   </div>
 </header>
@@ -109,18 +109,6 @@
     <div class="panel practice-panel">
       <div class="practice-copy">
         <h3>我的和弦进行</h3><p>每张卡片占一小节。在第一拍换和弦，或把重复的和弦加两次。</p>
-        <div class="chord-builder">
-          <h3>按音级组一个和弦</h3>
-          <form id="builder-form">
-            <div class="board-controls"><label>1 的音名 <select id="builder-root"></select></label></div>
-            <label class="input-label" for="builder-input">组成音级（以大调为基准）</label>
-            <div class="symbol-entry"><input id="builder-input" type="text" value="135" maxlength="50" placeholder="135 或 1 b3 5" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="builder-status"><button class="secondary" type="submit">识别和弦</button></div>
-          </form>
-          <div class="builder-result"><div id="builder-tones" class="tones"></div><label class="sr-only" for="builder-match">和弦名称</label><select id="builder-match"></select></div>
-          <p id="builder-status" class="input-status" role="status"></p>
-          <div class="actions"><a id="builder-view" class="secondary" href="#chords">查看指法</a><button id="builder-add" type="button" class="primary">＋ 加入练习</button></div>
-          <p class="hint">例如 C 的 135 = C 大三和弦，1 b3 5 = Cm。可识别图鉴中的 12 类和弦；上方输入是一组和弦的组成音，下方输入是和弦进行。</p>
-        </div>
         <form id="progression-form" class="progression-editor">
           <div class="board-controls progression-key">
             <label>练习调性 <select id="practice-key"></select></label>
@@ -199,6 +187,36 @@
         </div>
         <strong id="tuner-direction" class="tuner-direction">等待拨弦</strong>
         <p class="hint">偏低时调高，偏高时调低；绿色表示偏差在 ±5 音分内。</p>
+      </div>
+    </div>
+  </section>
+  <section id="piano" class="section" aria-labelledby="piano-title">
+    <div class="section-heading"><div><div class="kicker">05 / PLAY BY EAR</div><h2 id="piano-title">钢琴与练耳</h2></div><p>先听，再找出它们。</p></div>
+    <div class="panel piano-panel">
+      <div id="piano-workspace" class="piano-workspace" aria-label="可弹奏钢琴">
+        <div class="piano-toolbar">
+          <div class="board-controls"><label>起始音区 <select id="piano-octave"><option value="48">C3</option><option value="60" selected>C4</option><option value="72">C5</option></select></label><label>键盘 <select id="piano-span"><option value="12">一组八度</option><option value="24" selected>两组八度</option></select></label></div>
+          <button type="button" id="piano-expand" class="secondary">⛶ 放大 / 横屏</button>
+        </div>
+        <div class="piano-readout"><strong id="piano-note">点琴键开始弹奏</strong><label class="demo-toggle"><input type="checkbox" id="piano-computer" checked> 电脑键盘映射</label></div>
+        <p class="hint piano-help">电脑用 A W S E D F T G Y H U J K O L P ; 弹奏。手机支持多指同弹，点“放大 / 横屏”展开。</p>
+        <div id="piano-scroll" class="piano-scroll" tabindex="0" aria-label="钢琴键盘，较宽时可横向滚动"><div id="piano-keys" class="piano-keys" role="group" aria-label="可弹奏琴键"></div></div>
+        <p id="piano-screen-status" class="hint" role="status"></p>
+      </div>
+      <div class="ear-training">
+        <h3>听音找琴键</h3>
+        <div class="board-controls">
+          <label>题目 <select id="ear-count"><option value="1">一个音</option><option value="2">两个音</option><option value="3">三个音</option></select></label>
+          <label>范围 <select id="ear-pool"><option value="white">C 大调 · 白键</option><option value="chromatic">十二半音 · 含黑键</option></select></label>
+          <label>多音播放 <select id="ear-order"><option value="together">同时弹奏</option><option value="sequence">依次弹奏</option></select></label>
+          <label class="demo-toggle"><input type="checkbox" id="ear-give-reference" checked> 先给标准音</label>
+          <label>标准音 <select id="ear-reference"><option value="60">C4 · 中央 C</option><option value="69">A4 · 440 Hz</option></select></label>
+        </div>
+        <div class="actions"><button type="button" id="ear-new" class="primary">开始 / 下一题</button><button type="button" id="ear-replay" class="secondary" disabled>再听一遍</button><button type="button" id="ear-standard" class="secondary">听标准音</button></div>
+        <p class="hint">题目使用当前起始音区内的一个八度。点击钢琴或下方音名选答案，再点一次可取消；只判断音名，多个音不分顺序。</p>
+        <div id="ear-answers" class="ear-answers" role="group" aria-label="选择听到的音名"></div>
+        <div class="actions"><button type="button" id="ear-submit" class="primary" disabled>提交答案</button><button type="button" id="ear-reveal" class="secondary" disabled>显示答案</button><span id="ear-score" class="hint">已答 0 题 · 答对 0 题</span></div>
+        <p id="ear-status" class="input-status" role="status">点“开始 / 下一题”，听完后选择你听到的音。</p>
       </div>
     </div>
   </section>
