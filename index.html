@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=tuner-1">
+<link rel="stylesheet" href="style.css?v=tuner-responsive">
 <script src="music.js?v=clean-c" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=clean-c" defer></script>
-<script src="tuner.js?v=tuner-1" defer></script>
+<script src="tuner.js?v=tuner-responsive" defer></script>
 </head>
 <body id="home">
 <header class="site-header">
@@ -155,7 +155,9 @@
         <div class="board-controls">
           <label>模式 <select id="tuner-mode"><option value="guitar">吉他调音</option><option value="chromatic">自由识音</option></select></label>
           <label>基准 A4 <input id="tuner-reference" type="number" min="430" max="450" step="1" value="440"> Hz</label>
+          <label>灵敏度 <select id="tuner-sensitivity"><option value="high">高 · 轻拨 / 远距离</option><option value="standard">标准</option><option value="low">低 · 环境较吵</option></select></label>
         </div>
+        <div class="tuner-input"><label for="tuner-input-level">输入音量</label><meter id="tuner-input-level" min="0" max="100" value="0"></meter><span id="tuner-signal">等待麦克风</span></div>
         <div id="tuner-guitar">
           <label class="input-label" for="tuner-preset">调音目标（6 → 1 弦）</label>
           <select id="tuner-preset"></select>

@@ -180,7 +180,10 @@ input[type=range],input[type=checkbox]{accent-color:var(--lime)}
 .tuner-meter{position:relative;display:flex;justify-content:space-between;align-items:end;width:90%;height:64px;padding:0 0 1px;margin:4px 0 2px;color:var(--muted);font:10px var(--mono);background:repeating-linear-gradient(90deg,transparent 0,transparent calc(10% - 1px),#7a6d853b calc(10% - 1px),#7a6d853b 10%) center 9px/100% 29px no-repeat}
 .tuner-meter::before{content:"";position:absolute;left:5%;right:5%;top:9px;height:28px;border-top:1px solid #81708d;border-bottom:1px solid #81708d}
 .tuner-center{position:absolute;left:45.5%;width:9%;height:32px;top:7px;background:#d8fb7c20;border:1px solid #d8fb7c70;border-radius:4px}
-.tuner-needle{position:absolute;top:2px;left:50%;height:42px;width:3px;background:#ffcf82;transform:translateX(-50%);box-shadow:0 0 10px #ffcf8240;transition:left .1s linear}
+.tuner-needle{position:absolute;top:2px;left:50%;height:42px;width:3px;background:#ffcf82;transform:translateX(-50%);box-shadow:0 0 10px #ffcf8240;transition:left .05s linear}
+.tuner-input{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;color:var(--muted);font-size:12px}
+.tuner-input meter{width:110px;height:15px;accent-color:var(--lime)}
+.tuner-input span{flex-basis:100%;font-size:11px}
 .tuner-direction{color:#ffcf82;font-size:15px;min-height:24px;text-align:center}
 .tuner-display.in-tune .tuner-note,.tuner-display.in-tune .tuner-direction{color:var(--lime)}
 .tuner-display.in-tune .tuner-needle{background:var(--lime)}

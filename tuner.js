@@ -1,7 +1,7 @@
 "use strict";
 
 // YIN cumulative mean normalized difference, with sub-sample interpolation.
-function estimateTunerPitch(buffer, sampleRate) {
+function estimateTunerPitch(buffer, sampleRate, minimumRms = .0006) {
   const stride = Math.max(1, Math.round(sampleRate / 24000));
   const rate = sampleRate / stride;
   const size = Math.min(4096, Math.floor(buffer.length / stride));
@@ -19,7 +19,7 @@ function estimateTunerPitch(buffer, sampleRate) {
     samples[i] -= mean;
     energy += samples[i] * samples[i];
   }
-  if (Math.sqrt(energy / size) < .004) return null;
+  if (Math.sqrt(energy / size) < minimumRms) return null;
   const minLag = Math.max(2, Math.floor(rate / 2100));
   const maxLag = Math.min(Math.floor(rate / 30), Math.floor(size / 2) - 1);
   const windowSize = size - maxLag;
@@ -83,6 +83,7 @@ function parseTunerTargets(text) {
   let targets = [...presets[0][2]], locked = null, matched = null;
   let context, stream, source, analyser, frame, pending = false, active = false, request = 0;
   let reference = 440, lastFrequency = null, history = [], lastSignal = 0, lastFrame = 0;
+  const thresholds = { high: .0006, standard: .002, low: .006 };
 
   function targetText() {
     return el("tuner-mode").value === "chromatic" ? "自动识别最近的半音"
@@ -163,6 +164,8 @@ function parseTunerTargets(text) {
     context = null;
     el("tuner-start").textContent = "开启麦克风";
     el("tuner-status").textContent = message;
+    el("tuner-input-level").value = 0;
+    el("tuner-signal").textContent = "等待麦克风";
     resetReading();
   }
   async function start() {
@@ -191,7 +194,7 @@ function parseTunerTargets(text) {
       stream = localStream;
       stopMetronome();
       analyser = localContext.createAnalyser();
-      analyser.fftSize = 8192;
+      analyser.fftSize = Math.max(2048, Math.min(32768, Math.pow(2, Math.ceil(Math.log2(localContext.sampleRate * .085)))));
       source = localContext.createMediaStreamSource(localStream);
       source.connect(analyser);
       const buffer = new Float32Array(analyser.fftSize);
@@ -206,14 +209,20 @@ function parseTunerTargets(text) {
       lastSignal = performance.now();
       function listen(time) {
         if (!active || intent !== request) return;
-        if (time - lastFrame >= 110) {
+        if (time - lastFrame >= 50) {
           lastFrame = time;
           analyser.getFloatTimeDomainData(buffer);
-          const frequency = estimateTunerPitch(buffer, localContext.sampleRate);
+          let energy = 0;
+          for (let i = 0; i < buffer.length; i++) energy += buffer[i] * buffer[i];
+          const rms = Math.sqrt(energy / buffer.length);
+          const threshold = thresholds[el("tuner-sensitivity").value] ?? thresholds.high;
+          el("tuner-input-level").value = Math.max(0, Math.min(100, (20 * Math.log10(Math.max(rms, 1e-8)) + 72) / 72 * 100));
+          const frequency = estimateTunerPitch(buffer, localContext.sampleRate, threshold);
+          el("tuner-signal").textContent = rms < threshold ? "输入较轻，可再靠近一点麦克风" : frequency ? "已捕捉到单音" : "有声音，等待清晰的单音";
           if (frequency) {
             if (history.length && Math.abs(12 * Math.log2(frequency / history.at(-1))) > .8) history = [];
             history.push(frequency);
-            if (history.length > 5) history.shift();
+            if (history.length > 3) history.shift();
             const ordered = [...history].sort((a,b) => a-b);
             renderReading(ordered[Math.floor(ordered.length / 2)]);
             lastSignal = time;
@@ -274,6 +283,7 @@ function parseTunerTargets(text) {
     renderReading(lastFrequency);
   });
   el("tuner-start").addEventListener("click", start);
+  el("tuner-sensitivity").addEventListener("change", resetReading);
   document.addEventListener("visibilitychange", () => { if (document.hidden && (active || pending)) stop("已暂停收音，回到页面后可重新开启。"); });
   window.addEventListener("pagehide", () => { if (active || pending) stop(); });
   renderStrings();
