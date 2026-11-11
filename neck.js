@@ -3,22 +3,6 @@
 const fingerColors = ["#f2d9a0", "#54d99b", "#65b8ff", "#ffb451", "#f37ba6"];
 const neckAnimations = new WeakMap();
 const neckInteractions = new WeakMap();
-let neckLabelMode = "notes";
-
-function neckNoteLabel(note) {
-  if (neckLabelMode === "notes" || note === "—") return note;
-  const names = { C: "Do", D: "Re", E: "Mi", F: "Fa", G: "Sol", A: "La", B: "Si" };
-  return note.slice(1) + names[note[0]];
-}
-
-function setNeckLabelMode(mode) {
-  neckLabelMode = mode;
-  document.querySelectorAll("[data-neck-label]").forEach((select) => { select.value = mode; });
-  document.querySelectorAll(".live-neck [data-note]").forEach((label) => {
-    label.textContent = neckNoteLabel(label.dataset.note);
-  });
-}
-
 function crossedNeckStrings(from, to) {
   if (from.x === to.x) return [];
   return Array.from({ length: 6 }, (_, string) => ({ string, x: 60 + string * 37 }))
@@ -47,12 +31,14 @@ function neckDiagram(shape, tonic, type, note, id) {
   const info = qualities[type];
   const parts = [
     '<svg viewBox="0 0 310 421" role="group" aria-label="' + chordLabel(tonic, type, note) + ' · ' + shape.label + ' · 指法与拨弦示意">',
-    '<defs><linearGradient id="' + id + '-wood"><stop stop-color="#382014"/><stop offset=".35" stop-color="#67432a"/><stop offset=".7" stop-color="#432b1c"/><stop offset="1" stop-color="#25170f"/></linearGradient>',
-    '<pattern id="' + id + '-grain" width="29" height="153" patternUnits="userSpaceOnUse"><path d="M4-10Q-3 32 5 76T4 163M16-10Q28 38 17 82T16 163M23-10Q12 45 24 100T23 163" stroke="#e8b478" stroke-opacity=".15" fill="none"/><path d="M10-10Q21 35 10 100T10 163" stroke="#160e09" stroke-opacity=".5" fill="none"/></pattern></defs>',
-    '<path d="M43 61H262L272 370H34Z" fill="#140e0b" stroke="#a58354" stroke-width="2"/>',
-    '<path d="M47 62H258L267 367H39Z" fill="url(#' + id + '-wood)"/>',
-    '<path d="M47 62H258L267 367H39Z" fill="url(#' + id + '-grain)"/>'
+    '<defs><linearGradient id="' + id + '-wood"><stop stop-color="#30221b"/><stop offset=".4" stop-color="#463226"/><stop offset=".7" stop-color="#3c2b21"/><stop offset="1" stop-color="#2a1e18"/></linearGradient></defs>',
+    '<path d="M43 61H262L272 370H34Z" fill="#201811" stroke="#786248" stroke-width="1.5"/>',
+    '<path d="M47 62H258L267 367H39Z" fill="url(#' + id + '-wood)"/>'
   ];
+  for (let grain = 0; grain < 24; grain++) {
+    const center = 48 + grain * 9;
+    parts.push('<path d="M' + center + ' 66C' + (center - 2) + ' 165 ' + (center + 2) + ' 254 ' + center + ' 365" stroke="' + (grain % 3 ? '#c59c70' : '#100e0c') + '" stroke-width="' + (grain % 3 ? '.45' : '.7') + '" opacity=".16" fill="none"/>');
+  }
   for (let i = 0; i <= count; i++) {
     const line = top + i * row;
     const fret = first + i;
@@ -78,7 +64,7 @@ function neckDiagram(shape, tonic, type, note, id) {
     const degree = info.intervals.indexOf(interval);
     const pitch = muted ? "—" : spelling(tonic, interval, info.degrees[degree], note);
     const openNote = roots[mod(tuning[string])];
-    parts.push('<text class="neck-string-name" data-note="' + openNote + '" x="' + center + '" y="19">' + neckNoteLabel(openNote) + '</text>',
+    parts.push('<text class="neck-string-name" x="' + center + '" y="19">' + openNote + '</text>',
       '<text class="neck-open ' + (muted ? 'muted' : '') + '" x="' + center + '" y="45">' + (muted ? "×" : fret === 0 ? "○" : "") + '</text>',
       '<g class="neck-string' + (muted ? ' muted' : '') + '" data-neck-string="' + string + '">',
       '<path class="string-glow" d="M' + center + ' 64V370"/>',
@@ -87,7 +73,7 @@ function neckDiagram(shape, tonic, type, note, id) {
       const finger = shape.fingers[string];
       parts.push('<circle cx="' + center + '" cy="' + y(fret) + '" r="14" fill="' + fingerColors[finger] + '" stroke="#ffffffaa" stroke-width="1.5"/><text class="neck-finger" x="' + center + '" y="' + (y(fret) + 5) + '">' + finger + '</text>');
     }
-    parts.push('</g><text class="neck-pitch" data-note="' + pitch + '" x="' + center + '" y="393">' + neckNoteLabel(pitch) + '</text>',
+    parts.push('</g><text class="neck-pitch" x="' + center + '" y="393">' + pitch + '</text>',
       '<text class="neck-string-number" x="' + center + '" y="413">' + (6 - string) + '</text>');
   });
   // Broad transparent targets keep each string easy to pluck on a phone.

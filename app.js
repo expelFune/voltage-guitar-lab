@@ -6,11 +6,11 @@ const qualityOptions = Object.entries(qualities).map(([type, value]) => [type, v
 const mobile = matchMedia("(max-width: 600px)");
 const windows = [[0,5], [5,10], [10,15], [15,20], [19,24]];
 let mode = "scale";
-let root = 9;
-let scaleType = "minorPent";
-let chordRoot = 4;
+let root = 0;
+let scaleType = "major";
+let chordRoot = 0;
 let chordNote = roots[chordRoot];
-let quality = "minor";
+let quality = "major";
 let shapeIndex = 0;
 let positions = [];
 let activePosition;
@@ -762,9 +762,6 @@ function updateNavigation() {
   });
 }
 window.addEventListener("hashchange", updateNavigation);
-document.querySelectorAll("[data-neck-label]").forEach((select) => {
-  select.addEventListener("change", () => setNeckLabelMode(select.value));
-});
 bindNeckPlucking($("chord-neck"), () => ({ tonic: chordRoot, type: quality, index: shapeIndex, note: chordNote }));
 bindNeckPlucking($("practice-neck"), () => previewMeasure);
 options($("scale"), Object.entries(scales).map(([type, value]) => [type, value.label]), scaleType);
