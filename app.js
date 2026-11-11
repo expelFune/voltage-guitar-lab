@@ -310,7 +310,7 @@ function diagram(shape) {
   const marks = shape.frets.map((fret, index) => {
     const center = x(index);
     if (fret === null || fret === 0) return '<text x="' + center + '" y="16" fill="' + (fret === 0 ? "#d8fb7c" : "#c6b6db") + '">' + (fret === 0 ? "○" : "×") + '</text>';
-    return '<circle cx="' + center + '" cy="' + y(fret) + '" r="7" fill="#d8fb7c"/><text x="' + center + '" y="' + (y(fret) + 3.2) + '" fill="#20251b" font-size="9" font-weight="700">' + shape.fingers[index] + '</text>';
+    return '<circle cx="' + center + '" cy="' + y(fret) + '" r="7" fill="' + fingerColors[shape.fingers[index]] + '"/><text x="' + center + '" y="' + (y(fret) + 3.2) + '" fill="#20251b" font-size="9" font-weight="700">' + shape.fingers[index] + '</text>';
   });
   const labels = shape.frets.map((_, index) => '<text x="' + x(index) + '" y="110" fill="#c0b4cf" font-size="9">' + (6 - index) + '</text>');
   return '<svg viewBox="0 0 128 114" aria-hidden="true" text-anchor="middle" font-family="monospace">' + rows.join("") + strings.join("") + barres.join("") + marks.join("") + labels.join("") + '<text x="13" y="34" fill="#bca9fb" font-size="9">' + first + '品</text></svg>';
@@ -319,6 +319,7 @@ function diagram(shape) {
 function renderChords() {
   $("chord-name").textContent = selectedChordLabel() + " · " + qualities[quality].label;
   renderTones($("chord-tones"), chordRoot, qualities[quality], chordNote);
+  renderChordNeck();
   const buttons = shapeList().map((shape, index) => {
     const button = document.createElement("button");
     button.className = "shape-card";
@@ -329,11 +330,37 @@ function renderChords() {
     button.addEventListener("click", () => {
       shapeIndex = index;
       for (const [i, sibling] of [...$("chord-shapes").children].entries()) sibling.setAttribute("aria-pressed", String(i === shapeIndex));
+      renderChordNeck();
       if (mode === "chord") setMode("chord");
     });
     return button;
   });
   $("chord-shapes").replaceChildren(...buttons);
+}
+
+function renderChordNeck() {
+  $("neck-chord-label").textContent = selectedChordLabel();
+  renderNeck($("chord-neck"), { tonic: chordRoot, type: quality, index: shapeIndex, note: chordNote });
+}
+
+function bindNeckPlucking(container, getMeasure) {
+  async function play(event) {
+    const hit = event.target.closest("[data-pluck]");
+    if (!hit || !container.contains(hit)) return;
+    if (event.type === "keydown") {
+      if (!["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+    }
+    const measure = getMeasure();
+    if (!measure || (container.id === "practice-neck" && running)) return;
+    const string = Number(hit.dataset.pluck);
+    const shape = chordVoicings(measure.tonic, measure.type)[measure.index];
+    if (shape.frets[string] === null || !await unlockAudio()) return;
+    pluck(tuning[string] + shape.frets[string], audio.currentTime + .01, .2);
+    pulseNeck(container, string);
+  }
+  container.addEventListener("click", play);
+  container.addEventListener("keydown", play);
 }
 $("chord-search").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -350,7 +377,10 @@ $("chord-root").addEventListener("change", (event) => chooseChord(Number(event.t
 $("quality").addEventListener("change", (event) => chooseChord(chordRoot, event.target.value));
 $("play-chord").addEventListener("click", async () => {
   const shape = activeShape();
-  if (await unlockAudio()) strum(shape, audio.currentTime + .02, .12);
+  if (await unlockAudio()) {
+    strum(shape, audio.currentTime + .02, .12);
+    animateStrum($("chord-neck"), shape, 20);
+  }
 });
 $("show-chord").addEventListener("click", () => setMode("chord"));
 $("add-chord").addEventListener("click", () => addMeasure(chordRoot, quality, shapeIndex, chordNote));
@@ -472,6 +502,7 @@ function moveMeasure(index, distance) {
 }
 
 function renderProgression() {
+  renderPracticeNeck(progression[0]);
   const container = $("progression");
   container.replaceChildren(...progression.map((measure, index) => {
     const chord = measureLabel(measure);
@@ -482,7 +513,11 @@ function renderProgression() {
     const number = document.createElement("small");
     number.textContent = String(index + 1).padStart(2, "0");
     const sound = measureButton(chord, "试听第 " + (index + 1) + " 小节 " + chord, async () => {
-      if (await unlockAudio()) strum(shapeFor(measure), audio.currentTime + .02, .12);
+      if (!await unlockAudio() || running) return;
+      previewMeasure = measure;
+      renderPracticeNeck(measure);
+      strum(shapeFor(measure), audio.currentTime + .02, .12);
+      animateStrum($("practice-neck"), shapeFor(measure), 20);
     });
     sound.title = shapeFor(measure).label;
     title.append(number, sound);
@@ -541,6 +576,21 @@ let beatNumber = 0;
 let nextTime = 0;
 let practiceBus;
 let playbackIntent = 0;
+let previewMeasure;
+let pickingTimer;
+
+function renderPracticeNeck(measure) {
+  previewMeasure = measure;
+  $("practice-neck-label").textContent = measure ? measureLabel(measure) : "自由节拍";
+  renderNeck($("practice-neck"), measure);
+  const pattern = measure && $("playback-style").value === "arpeggio" ? pickingPattern(shapeFor(measure), Number($("meter").value)) : [];
+  $("picking-steps").replaceChildren(...pattern.map((string, index) => {
+    const step = document.createElement("span");
+    step.innerHTML = '<b>' + (6 - string) + '</b><small>' + (index % 2 ? "&" : Math.floor(index / 2) + 1) + '</small>';
+    return step;
+  }));
+  $("picking-hint").textContent = pattern.length ? "上排数字是弦号，下排是拍点；第一下从最低音开始。" : "每小节第一拍，从最低发声弦向细弦扫下。";
+}
 function renderBeats() {
   $("beats").replaceChildren(...Array.from({ length: Number($("meter").value) }, (_, index) => {
     const label = document.createElement("span");
@@ -564,9 +614,30 @@ function tick() {
   const beat = beatNumber % meter;
   const measureIndex = progression.length ? Math.floor(beatNumber / meter) % progression.length : -1;
   const measure = progression[measureIndex];
+  if (beat === 0 && measure) renderPracticeNeck(measure);
   nextTime = Math.max(nextTime, audio.currentTime + .015);
   clickBeat(beat === 0, nextTime);
-  if (beat === 0 && measure && $("practice-demo").checked) strum(shapeFor(measure), nextTime, .08, practiceBus);
+  if (measure) {
+    const shape = shapeFor(measure);
+    const delay = (nextTime - audio.currentTime) * 1000;
+    if ($("playback-style").value === "arpeggio") {
+      const pattern = pickingPattern(shape, meter);
+      const halfBeat = 30 / Number($("tempo").value);
+      for (let half = 0; half < 2; half++) {
+        const step = beat * 2 + half, string = pattern[step];
+        if ($("practice-demo").checked) pluck(tuning[string] + shape.frets[string], nextTime + half * halfBeat, .16, practiceBus);
+        pulseNeck($("practice-neck"), string, delay + half * halfBeat * 1000);
+      }
+      clearTimeout(pickingTimer);
+      $("picking-steps").querySelectorAll("span").forEach((element, index) => element.classList.toggle("active", index === beat * 2));
+      pickingTimer = setTimeout(() => {
+        $("picking-steps").querySelectorAll("span").forEach((element, index) => element.classList.toggle("active", index === beat * 2 + 1));
+      }, delay + halfBeat * 1000);
+    } else if (beat === 0) {
+      if ($("practice-demo").checked) strum(shape, nextTime, .08, practiceBus);
+      animateStrum($("practice-neck"), shape, delay);
+    }
+  }
   [...$("beats").children].forEach((item, index) => item.classList.toggle("active", index === beat));
   $("progression").querySelectorAll(".measure").forEach((item, index) => item.classList.toggle("active", index === measureIndex));
   $("current-chord").textContent = measure ? "第 " + (measureIndex + 1) + " 小节 · " + measureLabel(measure) : "自由节拍";
@@ -578,6 +649,8 @@ function stopMetronome() {
   playbackIntent++;
   running = false;
   clearTimeout(beatTimer);
+  clearTimeout(pickingTimer);
+  clearNeckAnimation($("practice-neck"));
   if (practiceBus) {
     practiceBus.disconnect();
     practiceBus = null;
@@ -598,7 +671,8 @@ $("metronome-button").addEventListener("click", async () => {
   $("metronome-button").textContent = "■ 停止练习";
   tick();
 });
-$("meter").addEventListener("change", () => { stopMetronome(); renderBeats(); });
+$("meter").addEventListener("change", () => { stopMetronome(); renderBeats(); renderPracticeNeck(previewMeasure); });
+$("playback-style").addEventListener("change", () => { stopMetronome(); renderPracticeNeck(previewMeasure); });
 function changeTempo(value) {
   $("tempo").value = value;
   $("tempo-value").value = $("tempo").value;
@@ -616,6 +690,8 @@ function updateNavigation() {
   });
 }
 window.addEventListener("hashchange", updateNavigation);
+bindNeckPlucking($("chord-neck"), () => ({ tonic: chordRoot, type: quality, index: shapeIndex, note: chordNote }));
+bindNeckPlucking($("practice-neck"), () => previewMeasure);
 options($("scale"), Object.entries(scales).map(([type, value]) => [type, value.label]), scaleType);
 options($("key-root"), rootOptions, 0);
 options($("chord-root"), rootOptions, chordRoot);
