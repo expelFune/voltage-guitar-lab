@@ -47,7 +47,7 @@ function sameEarAnswer(answer, expected) {
       if (context.state !== "running") await context.resume();
       return context.state === "running";
     } catch {
-      el("piano-note").textContent = "音频暂不可用，请检查浏览器声音设置。";
+      el("piano-note").textContent = tr("音频暂不可用，请检查浏览器声音设置。", "Audio is unavailable. Please check your browser's sound settings.");
       return false;
     }
   }
@@ -92,7 +92,7 @@ function sameEarAnswer(answer, expected) {
       key.classList.toggle("pressed", held.has(midi));
       key.classList.toggle("answer-selected", Boolean(target && !revealed && guesses.has(answerValue(midi))));
     });
-    el("piano-note").textContent = held.size ? [...held.keys()].sort((a,b) => a-b).map(noteName).join(" ＋ ") : "点琴键开始弹奏";
+    el("piano-note").textContent = held.size ? [...held.keys()].sort((a,b) => a-b).map(noteName).join(" ＋ ") : tr("点琴键开始弹奏", "Tap the keys to play");
   }
 
   function chooseAnswer(pitch) {
@@ -100,7 +100,7 @@ function sameEarAnswer(answer, expected) {
     if (guesses.has(pitch)) guesses.delete(pitch);
     else guesses.add(pitch);
     el("ear-answers").querySelectorAll("button").forEach((button) => button.setAttribute("aria-pressed", String(guesses.has(Number(button.dataset.pitch)))));
-    el("ear-status").textContent = "已选择 " + guesses.size + " / " + target.length + " 个音。";
+    el("ear-status").textContent = tr("已选择 " + guesses.size + " / " + target.length + " 个音。", "Selected " + guesses.size + " / " + target.length + " notes.");
     highlight();
   }
 
@@ -167,7 +167,7 @@ function sameEarAnswer(answer, expected) {
       key.dataset.pianoMidi = midi;
       key.style.width = ((black ? 62 : 100) / whiteCount) + "%";
       const letter = keyCodes[offset] ? keyCodes[offset].replace("Key","").replace("Semicolon",";") : "";
-      key.setAttribute("aria-label", noteName(midi) + (letter ? "，电脑按键 " + letter : ""));
+      key.setAttribute("aria-label", tr(noteName(midi) + (letter ? "，电脑按键 " + letter : ""), noteName(midi) + (letter ? ", keyboard key " + letter : "")));
       if (black) key.style.left = (whites / whiteCount * 100) + "%";
       else whites++;
       key.innerHTML = '<span>' + noteName(midi) + '</span><small>' + letter + '</small>';
@@ -208,7 +208,7 @@ function sameEarAnswer(answer, expected) {
     keyWidth = Math.max(8, Math.min(120, width));
     board.style.setProperty("--piano-key-width", keyWidth + "px");
     board.style.minWidth = board.style.width = (whiteNotes.length * keyWidth) + "px";
-    el("piano-zoom-label").textContent = "键宽 " + Math.round(keyWidth) + "px";
+    el("piano-zoom-label").textContent = tr("键宽 " + Math.round(keyWidth) + "px", "Key width " + Math.round(keyWidth) + "px");
     el("piano-zoom-out").disabled = keyWidth <= 8;
     el("piano-zoom-in").disabled = keyWidth >= 120;
     updateScroll();
@@ -304,7 +304,7 @@ function sameEarAnswer(answer, expected) {
     guesses.clear();
     revealed = false;
     for (const id of ["ear-submit","ear-reveal","ear-replay"]) el(id).disabled = true;
-    el("ear-status").textContent = "设置已更新，点“开始 / 下一题”。";
+    el("ear-status").textContent = tr("设置已更新，点“开始 / 下一题”。", "Settings updated. Choose Start / Next question.");
     renderAnswerButtons();
     silence();
   }
@@ -313,8 +313,11 @@ function sameEarAnswer(answer, expected) {
     const length = Number(el("ear-span").value);
     const first = Math.max(24, Math.min(108 - length, Number(el("ear-start").value)));
     el("ear-start").value = first;
-    el("ear-range-hint").textContent = "出题音域 " + noteName(first) + " — " + noteName(first + length - 1)
-      + (el("ear-octave-answer").checked ? "，答案区分八度。" : "，只判断音名。") + " 多个音不分顺序，可点钢琴或音名作答。";
+    const range = noteName(first) + " — " + noteName(first + length - 1);
+    el("ear-range-hint").textContent = tr("出题音域 " + range
+      + (el("ear-octave-answer").checked ? "，答案区分八度。" : "，只判断音名。") + " 多个音不分顺序，可点钢琴或音名作答。",
+    "Question range: " + range + (el("ear-octave-answer").checked ? ". Include the octave in your answer." : ". Identify note names only.")
+      + " Note order does not matter. Answer with the piano or note buttons.");
     return Array.from({length}, (_,i) => first + i).filter((midi) => el("ear-pool").value !== "white" || whitePitchClasses.includes(mod(midi)));
   }
   function renderAnswerButtons() {
@@ -360,7 +363,7 @@ function sameEarAnswer(answer, expected) {
     renderAnswerButtons();
     highlight();
     for (const id of ["ear-submit","ear-reveal","ear-replay"]) el(id).disabled = false;
-    el("ear-status").textContent = "请听 " + target.length + " 个音，然后选出音名。";
+    el("ear-status").textContent = tr("请听 " + target.length + " 个音，然后选出音名。", "Listen to " + target.length + (target.length === 1 ? " note, then select its name." : " notes, then select their names."));
     void playQuestion();
   });
   el("ear-replay").addEventListener("click", () => { void playQuestion(); });
@@ -376,15 +379,17 @@ function sameEarAnswer(answer, expected) {
   function finish(showOnly) {
     if (!target || revealed) return;
     if (!showOnly && guesses.size !== target.length) {
-      el("ear-status").textContent = "这题有 " + target.length + " 个音，请选满后再提交。";
+      el("ear-status").textContent = tr("这题有 " + target.length + " 个音，请选满后再提交。", "This question has " + target.length + (target.length === 1 ? " note. Select it before submitting." : " notes. Select all of them before submitting."));
       return;
     }
     const right = sameEarAnswer(guesses, target.map(answerValue));
     revealed = true;
     answered++;
     if (!showOnly && right) correct++;
-    el("ear-status").textContent = (showOnly ? "答案是 " : right ? "答对了！" : "再听听这些音：") + target.map((midi) => el("ear-octave-answer").checked ? noteName(midi) : roots[mod(midi)]).join(" · ");
-    el("ear-score").textContent = "已答 " + answered + " 题 · 答对 " + correct + " 题";
+    const answer = target.map((midi) => el("ear-octave-answer").checked ? noteName(midi) : roots[mod(midi)]).join(" · ");
+    el("ear-status").textContent = tr((showOnly ? "答案是 " : right ? "答对了！" : "再听听这些音：") + answer,
+      (showOnly ? "Answer: " : right ? "Correct! " : "Listen again to these notes: ") + answer);
+    el("ear-score").textContent = tr("已答 " + answered + " 题 · 答对 " + correct + " 题", "Answered " + answered + " · Correct " + correct);
     el("ear-submit").disabled = el("ear-reveal").disabled = true;
     highlight();
   }
@@ -466,7 +471,7 @@ function sameEarAnswer(answer, expected) {
     viewStart = savedViewStart;
     setKeyWidth(savedKeyWidth);
     updateLandscape();
-    el("piano-expand").textContent = "⛶ 放大 / 横屏";
+    el("piano-expand").textContent = tr("⛶ 放大 / 横屏", "⛶ Expand / Landscape");
     el("piano-screen-status").textContent = "";
     try { screen.orientation?.unlock?.(); } catch { /* Orientation may be browser-controlled. */ }
     nativeFullscreen = false;
@@ -491,9 +496,9 @@ function sameEarAnswer(answer, expected) {
     fitView();
     jumpTo(60);
     el("piano-span").value = span;
-    el("piano-expand").textContent = "退出放大";
+    el("piano-expand").textContent = tr("退出放大", "Exit expanded view");
     el("piano-expand").focus({ preventScroll: true });
-    el("piano-screen-status").textContent = "横屏布局已锁定，可横持手机弹奏；电脑按 Esc 退出。";
+    el("piano-screen-status").textContent = tr("横屏布局已锁定，可横持手机弹奏；电脑按 Esc 退出。", "Landscape layout is fixed. Hold your phone sideways to play; press Esc to exit on desktop.");
     if (overlay.requestFullscreen) {
       try {
         await overlay.requestFullscreen();

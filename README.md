@@ -5,11 +5,13 @@ See the notes. Hear the connections. Play them yourself.
 
 **[打开网站 / Open website](https://expelfune.github.io/voltage-guitar-lab/index.html)** · **[版本发布 / Releases](https://github.com/expelFune/voltage-guitar-lab/releases)** · **[GitHub 仓库 / Repository](https://github.com/expelFune/voltage-guitar-lab)**
 
+网站语言 / Website language: **[中文](https://expelfune.github.io/voltage-guitar-lab/index.html?lang=zh)** · **[English](https://expelfune.github.io/voltage-guitar-lab/index.html?lang=en)**
+
 [简体中文](#简体中文) | [English](#english)
 
 ## 简体中文
 
-弦上实验室是一个可以边听、边看、边弹的电吉他学习与练习网站。把音阶、和弦、节奏、调音和练耳放在同一个页面里，打开浏览器就能使用，无需注册。支持电脑和手机，网站界面目前以中文为主。
+弦上实验室是一个可以边听、边看、边弹的电吉他学习与练习网站。把音阶、和弦、节奏、调音和练耳放在同一个页面里，打开浏览器就能使用，无需注册。支持电脑和手机，提供完整的中文与英文界面，可通过顶部按钮随时切换，并记住上次选择的语言。
 
 ### 直接在线使用
 
@@ -28,6 +30,7 @@ See the notes. Hear the connections. Play them yourself.
 ### 使用小提示
 
 - 点击页面中的试听按钮或琴键开始发声；调音时点击“开启麦克风”并允许访问麦克风。
+- 顶部的“中文 / English”按钮会原地切换界面语言，保留当前选择和练习内容；网址中的 `lang=zh` 或 `lang=en` 可用来分享指定语言。
 - 调音尽量在安静环境中一次拨一根弦。麦克风音频在浏览器本机分析，不上传服务器。
 - 电脑钢琴映射为 `A W S E D F T G Y H U J K O L P ;`，对应当前起始音区的连续半音。放大后按 `Esc` 退出。
 - 手机的原生全屏、方向锁定和可同时触控数量取决于浏览器与设备；不支持原生方向锁定时，页面会使用横向布局。
@@ -51,7 +54,7 @@ GitHub 仓库的网页文件位于根目录：`index.html` 是页面入口，`mu
 
 ## English
 
-Voltage Guitar Lab is an interactive electric guitar learning and practice website. Explore scales, chords, rhythm, tuning, and ear training in one place—listen, look, and play directly in your browser. No account is required. It works on desktop and mobile; the website interface is currently primarily in Chinese.
+Voltage Guitar Lab is an interactive electric guitar learning and practice website. Explore scales, chords, rhythm, tuning, and ear training in one place—listen, look, and play directly in your browser. No account is required. It works on desktop and mobile with full Chinese and English interfaces. Use the buttons at the top to switch languages; your preference is remembered.
 
 ### Use the website online
 
@@ -70,6 +73,7 @@ The [Releases page](https://github.com/expelFune/voltage-guitar-lab/releases) is
 ### Tips
 
 - Tap a playback button or a key to start audio. For tuning, tap “开启麦克风” (Enable microphone) and grant microphone access.
+- The “中文 / English” buttons switch the interface in place while preserving your selections and practice content. Share a specific language with `lang=zh` or `lang=en` in the URL.
 - Tune one string at a time in a quiet environment. Microphone audio is analyzed locally in your browser and is not uploaded to a server.
 - Piano keyboard mapping: `A W S E D F T G Y H U J K O L P ;`. These keys play consecutive semitones from the current starting octave. Press `Esc` to leave the expanded view on desktop.
 - Native fullscreen, orientation locking, and the number of simultaneous touches depend on your browser and device. A landscape page layout is used when native orientation locking is unavailable.

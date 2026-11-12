@@ -14,8 +14,19 @@ function spelling(root, semitones, degree, note = roots[root]) {
   return letters[letter] + (offset < 0 ? "♭".repeat(-offset) : "♯".repeat(offset));
 }
 
+const musicLabelEnglish = {
+  "大调": "Major", "自然小调": "Natural minor", "小调五声音阶": "Minor pentatonic",
+  "大调五声音阶": "Major pentatonic", "小调布鲁斯": "Minor blues", "多利亚": "Dorian",
+  "弗里吉亚": "Phrygian", "利底亚": "Lydian", "混合利底亚": "Mixolydian",
+  "洛克里亚": "Locrian", "和声小调": "Harmonic minor", "旋律小调（上行）": "Melodic minor (ascending)",
+  "大三和弦": "Major triad", "小三和弦": "Minor triad", "强力和弦": "Power chord",
+  "属七和弦": "Dominant seventh", "大七和弦": "Major seventh", "小七和弦": "Minor seventh",
+  "挂二和弦": "Suspended second", "挂四和弦": "Suspended fourth", "减三和弦": "Diminished triad",
+  "增三和弦": "Augmented triad", "半减七和弦": "Half-diminished seventh", "减七和弦": "Diminished seventh"
+};
+I18n.addTranslations(musicLabelEnglish);
 function definition(label, suffix, intervals, degrees, formula) {
-  return { label, suffix, intervals, degrees, formula };
+  return { label, labelEn: musicLabelEnglish[label] || label, suffix, intervals, degrees, formula };
 }
 const major = definition("大调", "", [0, 2, 4, 5, 7, 9, 11], [1, 2, 3, 4, 5, 6, 7], "1  2  3  4  5  6  7");
 const minor = definition("自然小调", "", [0, 2, 3, 5, 7, 8, 10], [1, 2, 3, 4, 5, 6, 7], "1  2  ♭3  4  5  ♭6  ♭7");
@@ -117,14 +128,16 @@ const movable = {
 
 function chordVoicings(root, quality) {
   const result = openVoicings.filter(([note, type]) => note === root && type === quality)
-    .map(([, , frets, fingers]) => ({ frets, fingers, label: "开放指法" }));
+    .map(([, , frets, fingers]) => ({ frets, fingers, label: "开放指法", labelEn: "Open position" }));
   for (const [bass, offsets, fingers] of movable[quality]) {
     for (let fret = mod(root - tuning[bass]); fret <= MAX_FRET; fret += 12) {
       const frets = offsets.map((offset) => offset === null ? null : fret + offset);
       if (frets.some((value) => value !== null && (value < 0 || value > MAX_FRET))) continue;
       if (result.some((shape) => shape.frets.join(",") === frets.join(","))) continue;
       result.push({
-        frets, fingers, label: fret === 0 ? (6 - bass) + " 弦根音 · 开放" : (6 - bass) + " 弦根音 · " + fret + " 品"
+        frets, fingers,
+        label: fret === 0 ? (6 - bass) + " 弦根音 · 开放" : (6 - bass) + " 弦根音 · " + fret + " 品",
+        labelEn: "Root on string " + (6 - bass) + " · " + (fret === 0 ? "Open" : "Fret " + fret)
       });
     }
   }
@@ -174,8 +187,8 @@ function parseProgression(input, tonic, mode) {
   const normalized = input.normalize("NFKC").trim();
   const tokens = normalized.split(/[\s,、;|→–—−-]+/).filter(Boolean)
     .flatMap((token) => /^[1-7]+$/.test(token) ? [...token] : [token]);
-  if (!tokens.length) throw new Error("请输入和弦，例如 C G Am F，或输入级数 1645。");
-  if (tokens.length > MAX_MEASURES) throw new Error("最多可以排 " + MAX_MEASURES + " 小节。");
+  if (!tokens.length) throw new Error(tr("请输入和弦，例如 C G Am F，或输入级数 1645。", "Enter chords such as C G Am F, or degrees such as 1645."));
+  if (tokens.length > MAX_MEASURES) throw new Error(tr("最多可以排 " + MAX_MEASURES + " 小节。", "A progression can contain up to " + MAX_MEASURES + " bars."));
 
   let relative = true;
   const measures = tokens.map((token) => {
@@ -195,10 +208,10 @@ function parseProgression(input, tonic, mode) {
         return { ...chord, index: 0 };
       }
     }
-    throw new Error("识别不了「" + token + "」。试试 Am7、Bbmaj7、1645 或 5(7)。");
+    throw new Error(tr("识别不了「" + token + "」。试试 Am7、Bbmaj7、1645 或 5(7)。", "Could not recognize “" + token + "”. Try Am7, Bbmaj7, 1645, or 5(7)."));
   });
   if (!relative && tokens.some((token) => /^[1-7]/.test(token))) {
-    throw new Error("请在同一组里使用和弦名，或统一使用级数。");
+    throw new Error(tr("请在同一组里使用和弦名，或统一使用级数。", "Use either chord names or scale degrees throughout the progression."));
   }
   return { measures, relative };
 }

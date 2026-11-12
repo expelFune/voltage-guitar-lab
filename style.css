@@ -21,6 +21,14 @@ nav a{white-space:nowrap;font-size:13px;padding:8px;color:var(--muted);border-ra
 nav a:hover,nav a[aria-current]{background:#2c273d;color:var(--ink)}
 .tuning{font:11px var(--mono);color:var(--muted);white-space:nowrap}
 .online{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;background:var(--lime);box-shadow:0 0 10px #d8fb7c70}
+.language-switch{display:flex;flex:none;align-items:center;gap:2px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#232031}
+.language-switch button{border:0;border-radius:5px;padding:5px 7px;background:transparent;color:var(--muted);font-size:12px;min-height:30px;white-space:nowrap}
+.language-switch button[aria-pressed=true]{background:var(--lime);color:#222817;font-weight:700}
+html[lang=en] .intro h1{font-size:clamp(34px,5vw,58px);line-height:1.05;letter-spacing:-.04em}
+html[lang=en] .intro h1 span{display:block}
+html[lang=en] .panel-heading{flex-wrap:wrap;align-items:center}
+html[lang=en] .section-heading{flex-wrap:wrap;align-items:center}
+html[lang=en] .section-heading p{text-align:left}
 main{padding-top:19px}
 .intro{position:relative;isolation:isolate;overflow:hidden;border:1px solid #4b3f65;border-radius:16px;padding:21px 26px 25px;background:radial-gradient(ellipse at 80% 46%,#56377b,#2a2141 51%,#1c192b 87%);}
 .intro::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(#cbb4ff18 1px,transparent 1px),linear-gradient(90deg,#cbb4ff18 1px,transparent 1px);background-size:26px 26px;mask-image:linear-gradient(90deg,transparent,#000 70%)}
@@ -246,8 +254,11 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:720px){.tuning{display:none}.shape-list{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}.key-panel{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){
-  html{scroll-padding-top:102px}.header-inner{flex-wrap:wrap;justify-content:center;gap:1px;padding-block:5px}.brand{flex-basis:100%;justify-content:center}.brand small{display:none}.pick{width:24px;height:25px;font-size:18px}
-  nav{justify-content:center;width:100%;gap:2px;flex-wrap:wrap}nav a{padding:5px 6px;min-height:32px;font-size:12px}
+  html{scroll-padding-top:102px}.header-inner{flex-wrap:wrap;justify-content:space-between;gap:3px 8px;padding-block:5px}.brand{flex:1;justify-content:flex-start}.brand small{display:none}.pick{width:24px;height:25px;font-size:18px}
+  nav{order:3;justify-content:center;width:100%;gap:2px;flex-wrap:wrap}nav a{padding:5px 6px;min-height:32px;font-size:12px}
+  .language-switch button{padding:4px 6px;min-height:32px}
+  html[lang=en] .brand strong{font-size:14px}
+  html[lang=en] .intro{min-height:290px}
   main{padding-top:11px}.intro{padding:12px 13px 15px;min-height:230px}.intro img{width:90%;height:100px;right:0;top:auto;bottom:2px}.intro-index{display:none}
   .section{margin-top:15px}.panel-heading{align-items:flex-end;gap:5px;margin-bottom:10px}h2{font-size:22px}.segmented button{padding:5px 6px;font-size:12px}
   .board-controls{gap:7px 9px}.board-controls label{min-width:0}.board-controls select{min-width:0;max-width:min(56vw,230px)}

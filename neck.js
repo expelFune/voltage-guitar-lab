@@ -30,7 +30,7 @@ function neckDiagram(shape, tonic, type, note, id) {
   const y = (fret) => top + (fret - first + .67) * row;
   const info = qualities[type];
   const parts = [
-    '<svg viewBox="0 0 310 421" role="group" aria-label="' + chordLabel(tonic, type, note) + ' · ' + shape.label + ' · 指法与拨弦示意">',
+    '<svg viewBox="0 0 310 421" role="group" aria-label="' + tr(chordLabel(tonic, type, note) + ' · ' + shape.label + ' · 指法与拨弦示意', chordLabel(tonic, type, note) + ' · ' + shape.labelEn + ' · Fingering and picking diagram') + '">',
     '<defs><linearGradient id="' + id + '-wood"><stop stop-color="#30221b"/><stop offset=".4" stop-color="#463226"/><stop offset=".7" stop-color="#3c2b21"/><stop offset="1" stop-color="#2a1e18"/></linearGradient></defs>',
     '<path d="M43 61H262L272 370H34Z" fill="#201811" stroke="#786248" stroke-width="1.5"/>',
     '<path d="M47 62H258L267 367H39Z" fill="url(#' + id + '-wood)"/>'
@@ -78,7 +78,7 @@ function neckDiagram(shape, tonic, type, note, id) {
   });
   // Broad transparent targets keep each string easy to pluck on a phone.
   shape.frets.forEach((fret, string) => {
-    if (fret !== null) parts.push('<rect class="neck-hit" data-pluck="' + string + '" x="' + (x(string) - 17) + '" y="62" width="34" height="310" fill="transparent" role="button" tabindex="0" aria-label="拨响 ' + (6 - string) + ' 弦，' + (fret === 0 ? '空弦' : fret + ' 品') + '"/>');
+    if (fret !== null) parts.push('<rect class="neck-hit" data-pluck="' + string + '" x="' + (x(string) - 17) + '" y="62" width="34" height="310" fill="transparent" role="button" tabindex="0" aria-label="' + tr('拨响 ' + (6 - string) + ' 弦，' + (fret === 0 ? '空弦' : fret + ' 品'), 'Pluck string ' + (6 - string) + ', ' + (fret === 0 ? 'Open' : 'Fret ' + fret)) + '"/>');
   });
   parts.push('<g class="neck-pick" aria-hidden="true" visibility="hidden"><path d="M-12-10Q0-17 12-10Q17-4 0 15Q-17-4-12-10Z" fill="#ffe09b" stroke="#fff5d6" stroke-width="1.5"/><path d="M-5-6Q0-10 5-6" fill="none" stroke="#b68745" stroke-width="1.5"/></g></svg>');
   return parts.join("");
@@ -88,7 +88,7 @@ function renderNeck(container, measure) {
   neckInteractions.get(container)?.();
   clearNeckAnimation(container);
   container.innerHTML = measure ? neckDiagram(chordVoicings(measure.tonic, measure.type)[measure.index], measure.tonic, measure.type, measure.note, container.id)
-    : '<p class="hint neck-empty">添加和弦后，这里会显示当前小节的指法。</p>';
+    : '<p class="hint neck-empty">' + tr('添加和弦后，这里会显示当前小节的指法。', 'Add a chord to see the fingering for the current bar here.') + '</p>';
 }
 
 function pulseNeck(container, string, delay = 0) {
