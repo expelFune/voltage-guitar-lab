@@ -76,6 +76,8 @@ select{max-width:100%}
 .fret{touch-action:pan-x pan-y;user-select:none;-webkit-user-select:none}
 .fret.held{background:#574273}
 .fret.held span{outline:2px solid #fff;outline-offset:2px;box-shadow:0 0 12px #d8fb7c88}
+.fret.playing{background:#685043}
+.fret.playing span{background:#ffd579;color:#271d13;outline:2px solid #fff4cf;outline-offset:2px;box-shadow:0 0 15px #ffd579a0}
 .board-caption{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;margin:7px 0;font-size:12px;color:var(--muted)}
 .board-caption strong{color:var(--lime);font-weight:600}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 0;background:var(--lime)}

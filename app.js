@@ -16,6 +16,8 @@ let activePosition;
 let focusFret = null;
 let selected;
 const heldFretNotes = new Map();
+let scalePlayback = null;
+let scalePlayRequest = 0;
 const rootLabel = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
 function options(select, items, current) {
@@ -102,6 +104,10 @@ function fretButton(string, fret, info, tonic, shape) {
   const pitch = note + (Math.floor(midi / 12) - 1);
   const cell = document.createElement("button");
   cell.className = "fret";
+  cell.dataset.midi = midi;
+  cell.dataset.string = 6 - string;
+  cell.dataset.fret = fret;
+  cell.dataset.pitch = pitch;
   if (fret % 2) cell.classList.add("alt");
   if (fret === 0) cell.classList.add("open");
   if (info) cell.classList.add(isTone ? (inPosition ? (interval === 0 ? "root" : "tone") : "ghost") : "dim");
@@ -148,6 +154,7 @@ function fretButton(string, fret, info, tonic, shape) {
 }
 
 function renderBoard() {
+  stopScalePlayback();
   heldFretNotes.clear();
   const first = 0, last = MAX_FRET;
   const info = mode === "scale" ? scales[scaleType] : mode === "chord" ? qualities[quality] : null;
@@ -256,14 +263,78 @@ $("position").addEventListener("change", (event) => {
 });
 $("note-label").addEventListener("change", renderBoard);
 mobile.addEventListener("change", renderBoard);
+function stopScalePlayback() {
+  scalePlayRequest++;
+  if (scalePlayback) {
+    cancelAnimationFrame(scalePlayback.frame);
+    scalePlayback.cell?.classList.remove("playing");
+    scalePlayback.bus.disconnect();
+    scalePlayback = null;
+  }
+  $("play-scale").textContent = "▷ 试听音阶";
+  $("play-scale").setAttribute("aria-pressed", "false");
+}
+
+function scalePlaybackSteps(notes) {
+  const cells = [...$("fretboard").querySelectorAll(".fret")];
+  let previous;
+  return notes.map((midi) => {
+    const candidates = cells.filter((cell) => Number(cell.dataset.midi) === midi && (!activePosition || !cell.classList.contains("ghost")));
+    // One playable path, staying in the selected position and near the previous string.
+    candidates.sort((a, b) => {
+      const cost = (cell) => Number(cell.dataset.fret) + (previous ? Math.abs(Number(cell.dataset.string) - Number(previous.dataset.string)) * 2 : 0);
+      return cost(a) - cost(b);
+    });
+    const cell = candidates[0];
+    if (cell) previous = cell;
+    return { midi, cell };
+  });
+}
+
+function highlightScaleStep(playback, step) {
+  playback.cell?.classList.remove("playing");
+  playback.cell = step.cell;
+  if (!step.cell) return;
+  const cell = step.cell;
+  cell.classList.add("playing");
+  $("note-readout").textContent = cell.dataset.pitch + " / " + cell.dataset.string + " 弦 · " + cell.dataset.fret + " 品";
+  const viewport = $("fretboard").parentElement;
+  const bounds = cell.getBoundingClientRect(), frame = viewport.getBoundingClientRect();
+  // Scroll only the fretboard horizontally; keep the page at the user's reading position.
+  if (bounds.left < frame.left + 34) viewport.scrollLeft -= frame.left + 34 - bounds.left;
+  else if (bounds.right > frame.right - 4) viewport.scrollLeft += bounds.right - frame.right + 4;
+}
+
 $("play-scale").addEventListener("click", async () => {
+  if (scalePlayback) { stopScalePlayback(); return; }
+  const request = ++scalePlayRequest;
   const first = tuning[0] + mod(root - tuning[0]);
   const notes = activePosition
     ? [...new Set(activePosition.notes.flatMap((frets, string) => frets.map((fret) => fret + tuning[string])))].sort((a,b) => a-b)
     : [...scales[scaleType].intervals, 12].map((interval) => first + interval);
-  if (!await unlockAudio()) return;
+  if (!await unlockAudio() || request !== scalePlayRequest) return;
   const start = audio.currentTime + .02;
-  notes.forEach((midi, index) => pluck(midi, start + .16 * index, .16));
+  const bus = audio.createGain();
+  bus.connect(audio.destination);
+  const steps = scalePlaybackSteps(notes);
+  const playback = scalePlayback = { bus, steps, index: -1, cell: null, frame: null };
+  $("play-scale").textContent = "■ 停止试听";
+  $("play-scale").setAttribute("aria-pressed", "true");
+  steps.forEach((step, index) => pluck(step.midi, start + .16 * index, .16, bus));
+  playback.index = 0;
+  highlightScaleStep(playback, steps[0]);
+  function followAudio() {
+    if (scalePlayback !== playback) return;
+    const elapsed = audio.currentTime - start;
+    if (elapsed >= (steps.length - 1) * .16 + .86) { stopScalePlayback(); return; }
+    const index = Math.min(steps.length - 1, Math.floor(elapsed / .16));
+    if (index >= 0 && index !== playback.index) {
+      playback.index = index;
+      highlightScaleStep(playback, steps[index]);
+    }
+    playback.frame = requestAnimationFrame(followAudio);
+  }
+  playback.frame = requestAnimationFrame(followAudio);
 });
 
 function renderKey() {
@@ -757,7 +828,7 @@ function changeTempo(value) {
 $("tempo").addEventListener("input", (event) => changeTempo(event.target.value));
 $("tempo-down").addEventListener("click", () => changeTempo(Number($("tempo").value) - 5));
 $("tempo-up").addEventListener("click", () => changeTempo(Number($("tempo").value) + 5));
-document.addEventListener("visibilitychange", () => { if (document.hidden) stopMetronome(); });
+document.addEventListener("visibilitychange", () => { if (document.hidden) { stopMetronome(); stopScalePlayback(); } });
 
 function updateNavigation() {
   const active = location.hash || "#lab";
