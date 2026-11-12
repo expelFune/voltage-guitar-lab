@@ -26,8 +26,9 @@ function sameEarAnswer(answer, expected) {
   let target = null, guesses = new Set(), revealed = false, answered = 0, correct = 0, auditionEpoch = 0;
   let expanded = false, nativeFullscreen = false, oldOverflow = "", oldSpan, returnFocus;
   let keyWidth = 42;
-  let savedKeyWidth, savedScroll, scrollFrame, panPointer, panStart, panScroll;
-  let openingAtC4 = false, openingFrame;
+  // The viewport is a musical position, independent of browser scroll restoration.
+  let viewStart = 21; // C4: 21 white keys above C1.
+  let savedKeyWidth, savedViewStart, panPointer, panStart, panViewStart;
   const useTouchEvents = "ontouchstart" in window || navigator.maxTouchPoints > 0;
   const noteName = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
@@ -183,15 +184,16 @@ function sameEarAnswer(answer, expected) {
   }
 
   function updateScroll() {
-    const max = Math.max(0, scroll.scrollWidth - scroll.clientWidth);
-    const position = Math.max(0, Math.min(max, scroll.scrollLeft));
     const viewport = scroll.clientWidth || workspace.clientWidth || 600;
-    el("piano-range").value = max ? position / max * 1000 : 0;
-    const first = whiteNotes[Math.max(0, Math.min(49, Math.floor(position / keyWidth)))];
-    const last = whiteNotes[Math.max(0, Math.min(49, Math.floor((position + viewport - 1) / keyWidth)))];
+    const max = Math.max(0, whiteNotes.length - viewport / keyWidth);
+    viewStart = Math.max(0, Math.min(max, viewStart));
+    board.style.transform = "translate3d(" + (-viewStart * keyWidth) + "px,0,0)";
+    el("piano-range").value = max ? viewStart / max * 1000 : 0;
+    const first = whiteNotes[Math.min(whiteNotes.length - 1, Math.floor(viewStart + .000001))];
+    const last = whiteNotes[Math.min(whiteNotes.length - 1, Math.floor(viewStart + (viewport - 1) / keyWidth))];
     el("piano-range-label").textContent = noteName(first) + " — " + noteName(last);
-    el("piano-range-down").disabled = scroll.scrollLeft < 1;
-    el("piano-range-up").disabled = scroll.scrollLeft >= max - 1;
+    el("piano-range-down").disabled = viewStart <= .001;
+    el("piano-range-up").disabled = viewStart >= max - .001;
     base = Math.max(24, Math.min(96, Math.floor(first / 12) * 12));
     el("piano-octave").value = base;
     board.querySelectorAll("[data-piano-midi]").forEach((key) => {
@@ -199,16 +201,13 @@ function sameEarAnswer(answer, expected) {
       key.querySelector("small").textContent = code ? code.replace("Key","").replace("Semicolon",";") : "";
     });
   }
-  scroll.addEventListener("scroll", () => {
-    cancelAnimationFrame(scrollFrame);
-    scrollFrame = requestAnimationFrame(updateScroll);
-  });
+  // Focus and fullscreen may scroll overflow:hidden containers programmatically.
+  // Such scrolling must never become the piano's selected musical position.
+  scroll.addEventListener("scroll", () => { if (scroll.scrollLeft) scroll.scrollLeft = 0; });
   function setKeyWidth(width) {
-    const anchor = scroll.scrollLeft / keyWidth;
     keyWidth = Math.max(8, Math.min(120, width));
     board.style.setProperty("--piano-key-width", keyWidth + "px");
     board.style.minWidth = board.style.width = (whiteNotes.length * keyWidth) + "px";
-    scroll.scrollLeft = anchor * keyWidth;
     el("piano-zoom-label").textContent = "键宽 " + Math.round(keyWidth) + "px";
     el("piano-zoom-out").disabled = keyWidth <= 8;
     el("piano-zoom-in").disabled = keyWidth >= 120;
@@ -217,9 +216,18 @@ function sameEarAnswer(answer, expected) {
   function fitView() { setKeyWidth((scroll.clientWidth || workspace.clientWidth || 600) / (span / 12 * 7 + 1)); }
   function jumpTo(midi) {
     const index = whiteNotes.findIndex((note) => note >= midi);
-    scroll.scrollLeft = Math.max(0, index) * keyWidth;
+    viewStart = Math.max(0, index);
     updateScroll();
   }
+  board.addEventListener("focusin", (event) => {
+    const key = event.target.closest("[data-piano-midi]");
+    if (!key) return;
+    const index = whiteNotes.findIndex((note) => note >= Number(key.dataset.pianoMidi));
+    const visible = scroll.clientWidth / keyWidth;
+    if (index < viewStart + .5) viewStart = Math.max(0, index - .5);
+    else if (index + 1 > viewStart + visible) viewStart = index + 1 - visible;
+    updateScroll();
+  });
 
   board.addEventListener("pointerdown", (event) => {
     if (useTouchEvents && event.pointerType === "touch") return;
@@ -387,11 +395,25 @@ function sameEarAnswer(answer, expected) {
   el("piano-octave").addEventListener("change", () => jumpTo(Number(el("piano-octave").value)));
   el("piano-span").addEventListener("change", () => { span = Number(el("piano-span").value); fitView(); });
   el("piano-range").addEventListener("input", () => {
-    scroll.scrollLeft = Number(el("piano-range").value) / 1000 * Math.max(0, scroll.scrollWidth - scroll.clientWidth);
+    viewStart = Number(el("piano-range").value) / 1000 * Math.max(0, whiteNotes.length - scroll.clientWidth / keyWidth);
     updateScroll();
   });
-  el("piano-range-down").addEventListener("click", () => { scroll.scrollLeft = Math.max(0, scroll.scrollLeft - keyWidth * 7); updateScroll(); });
-  el("piano-range-up").addEventListener("click", () => { scroll.scrollLeft = Math.min(scroll.scrollWidth - scroll.clientWidth, scroll.scrollLeft + keyWidth * 7); updateScroll(); });
+  el("piano-range-down").addEventListener("click", () => { viewStart -= 7; updateScroll(); });
+  el("piano-range-up").addEventListener("click", () => { viewStart += 7; updateScroll(); });
+  scroll.addEventListener("wheel", (event) => {
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.shiftKey ? event.deltaY : 0;
+    if (!delta) return;
+    event.preventDefault();
+    viewStart += delta * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? scroll.clientWidth : 1) / keyWidth;
+    updateScroll();
+  }, { passive: false });
+  scroll.addEventListener("keydown", (event) => {
+    if (event.target !== scroll) return;
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    viewStart = event.key === "Home" ? 0 : event.key === "End" ? whiteNotes.length : viewStart + (event.key === "ArrowLeft" ? -1 : 1);
+    updateScroll();
+  });
   const pan = el("piano-pan");
   const panCoordinate = (event) => workspace.classList.contains("landscape-fixed") ? event.clientY : event.clientX;
   pan.addEventListener("pointerdown", (event) => {
@@ -399,12 +421,12 @@ function sameEarAnswer(answer, expected) {
     event.preventDefault();
     panPointer = event.pointerId;
     panStart = panCoordinate(event);
-    panScroll = scroll.scrollLeft;
+    panViewStart = viewStart;
     pan.setPointerCapture(panPointer);
   });
   pan.addEventListener("pointermove", (event) => {
     if (event.pointerId !== panPointer) return;
-    scroll.scrollLeft = panScroll - (panCoordinate(event) - panStart);
+    viewStart = panViewStart - (panCoordinate(event) - panStart) / keyWidth;
     updateScroll();
   });
   for (const type of ["pointerup","pointercancel","lostpointercapture"]) pan.addEventListener(type, (event) => {
@@ -417,28 +439,7 @@ function sameEarAnswer(answer, expected) {
   }
   el("piano-zoom-out").addEventListener("click", () => zoom(-1));
   el("piano-zoom-in").addEventListener("click", () => zoom(1));
-  function settleOpeningView() {
-    if (!expanded || !openingAtC4) return;
-    cancelAnimationFrame(openingFrame);
-    openingFrame = requestAnimationFrame(() => {
-      openingFrame = requestAnimationFrame(() => {
-        if (!expanded || !openingAtC4) return;
-        fitView();
-        jumpTo(60);
-      });
-    });
-  }
-  // Moving into the overlay and rotating can reset scrolling after layout.
-  // Keep the opening anchor until the player starts interacting with the piano.
-  function finishOpening(event) {
-    if (event.target === el("piano-expand")) return;
-    openingAtC4 = false;
-    cancelAnimationFrame(openingFrame);
-  }
-  ["pointerdown", "touchstart", "wheel", "keydown"].forEach((type) => {
-    workspace.addEventListener(type, finishOpening, { passive: true });
-  });
-  if (typeof ResizeObserver !== "undefined") new ResizeObserver(settleOpeningView).observe(scroll);
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(updateScroll).observe(scroll);
   function updateLandscape() {
     const width = (expanded && overlay.clientWidth) || window.visualViewport?.width || window.innerWidth;
     const height = (expanded && overlay.clientHeight) || window.visualViewport?.height || window.innerHeight;
@@ -446,14 +447,11 @@ function sameEarAnswer(answer, expected) {
     workspace.style.setProperty("--piano-long-side", Math.max(width, height) + "px");
     workspace.style.setProperty("--piano-short-side", Math.min(width, height) + "px");
     updateScroll();
-    settleOpeningView();
   }
 
   async function closeExpanded() {
     if (!expanded) return;
     expanded = false;
-    openingAtC4 = false;
-    cancelAnimationFrame(openingFrame);
     silence();
     workspace.classList.remove("expanded");
     workspace.classList.remove("landscape-fixed");
@@ -465,8 +463,8 @@ function sameEarAnswer(answer, expected) {
     originalPosition.parentNode.insertBefore(workspace, originalPosition.nextSibling);
     overlay.hidden = true;
     el("piano-span").value = span;
+    viewStart = savedViewStart;
     setKeyWidth(savedKeyWidth);
-    scroll.scrollLeft = savedScroll;
     updateLandscape();
     el("piano-expand").textContent = "⛶ 放大 / 横屏";
     el("piano-screen-status").textContent = "";
@@ -477,11 +475,10 @@ function sameEarAnswer(answer, expected) {
   el("piano-expand").addEventListener("click", async () => {
     if (expanded) return closeExpanded();
     expanded = true;
-    openingAtC4 = true;
     oldSpan = span;
     savedKeyWidth = keyWidth;
-    savedScroll = scroll.scrollLeft;
-    span = Math.max(24, span);
+    savedViewStart = viewStart;
+    span = 24;
     returnFocus = document.activeElement;
     oldOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -501,14 +498,15 @@ function sameEarAnswer(answer, expected) {
       try {
         await overlay.requestFullscreen();
         nativeFullscreen = true;
-        updateLandscape();
         if (!expanded) { if (document.fullscreenElement === overlay) await document.exitFullscreen(); return; }
+        updateLandscape();
+        fitView();
         try { await screen.orientation?.lock?.("landscape"); } catch { /* Keep the page itself horizontal when device rotation is locked. */ }
         if (!expanded) { try { screen.orientation?.unlock?.(); } catch {} return; }
         updateLandscape();
       } catch { /* The expanded layout remains available without native fullscreen. */ }
     }
-    settleOpeningView();
+    updateScroll();
   });
   document.addEventListener("fullscreenchange", () => { if (nativeFullscreen && document.fullscreenElement !== overlay) void closeExpanded(); });
   window.addEventListener("resize", updateLandscape);

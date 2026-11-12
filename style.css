@@ -199,7 +199,7 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
 .piano-readout{margin:11px 0 5px;min-height:25px}
 .piano-readout strong{color:var(--lime);font-size:14px}
 .piano-help{margin-bottom:9px}
-.piano-scroll{width:100%;min-width:0;max-width:100%;overflow-x:auto;padding:14px 0;scrollbar-color:#76628d #252130;overscroll-behavior-inline:contain;scroll-behavior:auto;scroll-snap-type:none}
+.piano-scroll{width:100%;min-width:0;max-width:100%;overflow:hidden;overflow:clip;padding:14px 0;scroll-behavior:auto;scroll-snap-type:none;overflow-anchor:none}
 .piano-keys{position:relative;display:flex;width:100%;min-width:calc(var(--piano-whites) * var(--piano-key-width,42px));isolation:isolate;user-select:none;-webkit-user-select:none;color-scheme:light;color-scheme:only light;forced-color-adjust:none}
 .piano-key{border-radius:0 0 7px 7px;touch-action:none;cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding:0 1px 10px;flex:none;font:11px var(--mono);transition:background .05s;min-width:0}
 .piano-key.white{width:calc(100% / var(--piano-whites));height:210px;background:linear-gradient(90deg,#ddd8e4,#fbf9ff 16%,#f1edf7 84%,#d2cadb);border:1px solid #aea3bb;color:#362a44;box-shadow:0 5px 0 #9b90ab}

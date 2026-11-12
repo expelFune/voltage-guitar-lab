@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=piano-c4-layout">
+<link rel="stylesheet" href="style.css?v=piano-view-c4">
 <script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
 <script src="app.js?v=board-scroll" defer></script>
-<script src="piano.js?v=piano-c4-layout" defer></script>
+<script src="piano.js?v=piano-view-c4" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
 <body id="home">
@@ -197,7 +197,7 @@
         <p class="hint piano-help">电脑用 A W S E D F T G Y H U J K O L P ; 弹奏。手机可多指同弹，放大后固定横向布局；音域较宽时可拖动音域条或琴键上方空白处。</p>
         <div class="piano-range-strip"><button id="piano-range-down" class="small-button" type="button" aria-label="向低音移动">‹</button><label for="piano-range">连续滑动音域 <output id="piano-range-label">C4 — C6</output></label><input id="piano-range" type="range" min="0" max="1000" step="1" value="0"><button id="piano-range-up" class="small-button" type="button" aria-label="向高音移动">›</button></div>
         <div id="piano-pan" class="piano-pan">⇠ 在这里拖动，可停在任意位置 ⇢</div>
-        <div id="piano-scroll" class="piano-scroll" tabindex="0" aria-label="钢琴键盘，较宽时可横向滚动"><div id="piano-keys" class="piano-keys" role="group" aria-label="可弹奏琴键"></div></div>
+        <div id="piano-scroll" class="piano-scroll" tabindex="0" aria-label="钢琴键盘，可用上方拖动条浏览，或用方向键移动音域"><div id="piano-keys" class="piano-keys" role="group" aria-label="可弹奏琴键"></div></div>
         <p id="piano-screen-status" class="hint" role="status"></p>
       </div>
       <div class="ear-training">
