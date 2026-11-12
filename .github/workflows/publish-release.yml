@@ -1,0 +1,53 @@
+name: Publish authorized website release
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-release.yml]
+
+jobs:
+  publish:
+    if: github.repository == 'expelFune/voltage-guitar-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Publish v1.0.0 with live website link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cat > release-notes.md <<'NOTES'
+          # 弦上实验室 · Voltage Guitar Lab
+          
+          ## 在线使用 / Use online
+          
+          **[点击打开网站 / Open the website](https://expelfune.github.io/voltage-guitar-lab/index.html)**
+          
+          手机和电脑都可以直接访问，无需下载、安装或启动本地服务。
+          
+          Open directly on your phone or computer. No download, installation, or local server is needed.
+          
+          ## 本次版本 / Included in this release
+          
+          - 0–24 品互动指板，多调音阶与把位，试听逐音高亮。 / Interactive 0–24 fretboard with scales, positions, and playback highlights.
+          - 多把位和弦图鉴，可逐弦拨奏和扫弦试听。 / Chord voicings with individual-string and strumming playback.
+          - 自定义和弦进行、卡农与 1645 等预设、节拍练习。 / Custom progressions, Canon and 1645 presets, and rhythm practice.
+          - 标准调弦、Drop D、自定义调音与单音识别。 / Standard tuning, Drop D, custom tuning targets, and single-note pitch detection.
+          - 可弹奏钢琴、手机横向放大、多点触控与随机练耳。 / Playable piano, expanded landscape layout, multitouch, and ear training.
+          - 中英双语 README。 / Chinese and English README.
+          
+          ## 说明 / Notes
+          
+          Releases 是版本说明页；上面的 GitHub Pages 链接才是在线网站。GitHub 自动附带的 Source code 文件是源码，日常使用无需下载。
+          
+          This Release page contains version notes. The GitHub Pages link above is the live website. The automatically generated Source code archives are for development; you do not need to download them to use the site.
+          
+          [项目说明 / README](https://github.com/expelFune/voltage-guitar-lab#readme) · [问题反馈 / Report an issue](https://github.com/expelFune/voltage-guitar-lab/issues)
+          NOTES
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo 'Release v1.0.0 already exists; leaving it unchanged.'
+          else
+            gh release create v1.0.0 --target '0edd1ee66b71f05007201fcbc4f21c27667cb7ef' --title 'v1.0.0 · 弦上实验室 / Voltage Guitar Lab' --notes-file release-notes.md
+          fi
