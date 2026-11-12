@@ -3,13 +3,19 @@
 看见音符，听见关系，动手弹出来。  
 See the notes. Hear the connections. Play them yourself.
 
-**[在线体验 / Live demo](https://expelfune.github.io/voltage-guitar-lab/index.html)** · **[GitHub 仓库 / Repository](https://github.com/expelFune/voltage-guitar-lab)**
+**[打开网站 / Open website](https://expelfune.github.io/voltage-guitar-lab/index.html)** · **[版本发布 / Releases](https://github.com/expelFune/voltage-guitar-lab/releases)** · **[GitHub 仓库 / Repository](https://github.com/expelFune/voltage-guitar-lab)**
 
 [简体中文](#简体中文) | [English](#english)
 
 ## 简体中文
 
 弦上实验室是一个可以边听、边看、边弹的电吉他学习与练习网站。把音阶、和弦、节奏、调音和练耳放在同一个页面里，打开浏览器就能使用，无需注册。支持电脑和手机，网站界面目前以中文为主。
+
+### 直接在线使用
+
+**[点击这里打开弦上实验室](https://expelfune.github.io/voltage-guitar-lab/index.html)**。这是可分享给其他人的公开网址，手机和电脑都能直接访问，无需下载或运行任何命令。
+
+[Releases 版本发布页](https://github.com/expelFune/voltage-guitar-lab/releases) 用于查看版本说明，每个版本说明中也可以放上在线网址；实际网站由 GitHub Pages 托管。
 
 ### 功能
 
@@ -27,7 +33,7 @@ See the notes. Hear the connections. Play them yourself.
 - 手机的原生全屏、方向锁定和可同时触控数量取决于浏览器与设备；不支持原生方向锁定时，页面会使用横向布局。
 - 若手机仍显示旧功能，可从 [index.html 入口](https://expelfune.github.io/voltage-guitar-lab/index.html) 重新打开并刷新。
 
-### 本地运行
+### 本地运行（仅开发者需要）
 
 项目是静态网站，使用 HTML、CSS、原生 JavaScript、SVG 和 Web Audio API，无需安装前端依赖。安装 Git 和 Python 3 后，在终端运行：
 
@@ -37,7 +43,7 @@ cd voltage-guitar-lab
 python -m http.server 8080
 ```
 
-浏览器打开 [http://localhost:8080](http://localhost:8080)。调音器需要麦克风权限，请通过 HTTPS 或 localhost 访问。
+上面的命令启动成功后，才在同一台电脑的浏览器中输入 `http://localhost:8080`。这只是本机开发地址，不是网站的公开网址，也不能分享给其他人使用。只想使用网站，请点击上方的“直接在线使用”。调音器需要麦克风权限，本地测试请通过 localhost 访问。
 
 GitHub 仓库的网页文件位于根目录：`index.html` 是页面入口，`music.js` 提供乐理数据与和弦计算，`app.js` 负责指板和节拍练习，`neck.js` 绘制和弦指板，`tuner.js` 与 `piano.js` 分别提供调音和钢琴练耳，`style.css` 控制样式。`assets/` 保存带内容版本标记的脚本与样式，发布时需与入口引用保持一致。
 
@@ -46,6 +52,12 @@ GitHub 仓库的网页文件位于根目录：`index.html` 是页面入口，`mu
 ## English
 
 Voltage Guitar Lab is an interactive electric guitar learning and practice website. Explore scales, chords, rhythm, tuning, and ear training in one place—listen, look, and play directly in your browser. No account is required. It works on desktop and mobile; the website interface is currently primarily in Chinese.
+
+### Use the website online
+
+**[Open Voltage Guitar Lab](https://expelfune.github.io/voltage-guitar-lab/index.html)**. This is the public, shareable website address. Open it on your phone or computer without downloading files or running commands.
+
+The [Releases page](https://github.com/expelFune/voltage-guitar-lab/releases) is for version notes and can also include the live website link. The live website is hosted on GitHub Pages.
 
 ### Features
 
@@ -63,7 +75,7 @@ Voltage Guitar Lab is an interactive electric guitar learning and practice websi
 - Native fullscreen, orientation locking, and the number of simultaneous touches depend on your browser and device. A landscape page layout is used when native orientation locking is unavailable.
 - If a mobile browser still shows older features, reopen the [index.html entry](https://expelfune.github.io/voltage-guitar-lab/index.html) and refresh.
 
-### Run locally
+### Run locally (for developers only)
 
 The site uses HTML, CSS, vanilla JavaScript, SVG, and the Web Audio API. No frontend dependencies are required. With Git and Python 3 installed, run:
 
@@ -73,7 +85,7 @@ cd voltage-guitar-lab
 python -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080). The tuner requires microphone permission; use HTTPS or localhost.
+Only after the server above is running, enter `http://localhost:8080` in a browser on that same computer. This is a local development address, not the public website, and cannot be shared as the website link. To use the site directly, follow “Use the website online” above. The tuner requires microphone permission; use localhost for local testing.
 
 In the GitHub repository, the website files live at the root: `index.html` is the entry page; `music.js` contains music theory data and chord calculations; `app.js` handles the fretboard and rhythm practice; `neck.js` draws chord neck diagrams; `tuner.js` and `piano.js` provide tuning and piano/ear training; and `style.css` defines the appearance. The `assets/` directory holds content-versioned scripts and styles, which must stay in sync with the entry page when publishing.
 
