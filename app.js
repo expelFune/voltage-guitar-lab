@@ -4,7 +4,6 @@ const $ = (id) => document.getElementById(id);
 const rootOptions = roots.map((name, index) => [index, name]);
 const qualityOptions = Object.entries(qualities).map(([type, value]) => [type, value.label]);
 const mobile = matchMedia("(max-width: 600px)");
-const windows = [[0,5], [5,10], [10,15], [15,20], [19,24]];
 let mode = "scale";
 let root = 0;
 let scaleType = "major";
@@ -14,7 +13,7 @@ let quality = "major";
 let shapeIndex = 0;
 let positions = [];
 let activePosition;
-let activeRange = mobile.matches ? windows[0] : [0,12];
+let focusFret = null;
 let selected;
 const heldFretNotes = new Map();
 const rootLabel = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
@@ -86,19 +85,8 @@ const shapeBounds = (shape) => {
   return [Math.min(...frets), Math.max(...frets)];
 };
 
-function focusRange(min, max) {
-  const start = Math.max(0, Math.min(min, MAX_FRET - 5));
-  activeRange = [start, Math.max(start + 5, max)];
-}
-
-function renderRange() {
-  const standard = [[0,12], ...windows, [0,MAX_FRET]];
-  if (!standard.some((range) => String(range) === String(activeRange))) standard.unshift(activeRange);
-  options($("fret-range"), standard.map(([start, end]) => [
-    [start,end], start === 0 && end === MAX_FRET ? "全指板 · 0–24 品" : start + "–" + end + " 品"
-  ]), activeRange);
-  $("previous-range").disabled = activeRange[0] === 0;
-  $("next-range").disabled = activeRange[1] === MAX_FRET;
+function focusRange(min) {
+  focusFret = Math.max(0, min - 1);
 }
 
 function fretButton(string, fret, info, tonic, shape) {
@@ -131,7 +119,7 @@ function fretButton(string, fret, info, tonic, shape) {
   }
   cell.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || heldFretNotes.has(event.pointerId)) return;
-    event.preventDefault();
+    if (event.pointerType === "mouse") event.preventDefault();
     heldFretNotes.set(event.pointerId, { cell, pitch, position: positionLabel });
     cell.setPointerCapture(event.pointerId);
     cell.classList.add("held");
@@ -161,13 +149,14 @@ function fretButton(string, fret, info, tonic, shape) {
 
 function renderBoard() {
   heldFretNotes.clear();
-  const [first, last] = activeRange;
+  const first = 0, last = MAX_FRET;
   const info = mode === "scale" ? scales[scaleType] : mode === "chord" ? qualities[quality] : null;
   const tonic = mode === "chord" ? chordRoot : root;
   const shape = mode === "chord" ? activeShape() : null;
   const board = $("fretboard");
   board.style.setProperty("--fret-count", last - first + 1);
   board.style.setProperty("--fret-width", mobile.matches ? "38px" : "34px");
+  board.style.minWidth = (31 + (last + 1) * (mobile.matches ? 38 : 34)) + "px";
   const cells = [document.createElement("span")];
   for (let fret = first; fret <= last; fret++) {
     const number = document.createElement("span");
@@ -196,7 +185,11 @@ function renderBoard() {
     : scales[scaleType].intervals.length === 5 ? "五个两音一弦把位。把位编号从 6 弦根音开始，同一个把位每 12 品重复。"
     : "七个三音一弦把位。把位编号从 6 弦根音开始，同一个把位每 12 品重复。")
     : mode === "chord" ? "实心亮点是当前指法要弹的位置，描边亮点是指板上的其他和弦音。" : "0 品是空弦。往琴桥每移动一品，音高升一个半音。";
-  renderRange();
+  if (focusFret !== null) {
+    const fretWidth = (board.getBoundingClientRect().width - 31) / (last + 1);
+    board.parentElement.scrollLeft = focusFret * fretWidth;
+    focusFret = null;
+  }
 }
 
 function positionOptions(reset = false) {
@@ -227,14 +220,6 @@ function setMode(next) {
   if (mode === "chord") focusRange(...shapeBounds(activeShape()));
   if (mode === "scale" && activePosition) focusRange(activePosition.min, activePosition.max);
   renderBoard();
-}
-
-function shiftRange(direction) {
-  const width = activeRange[1] - activeRange[0];
-  const start = Math.max(0, Math.min(MAX_FRET - width, activeRange[0] + direction * Math.max(1, width)));
-  activeRange = [start, start + width];
-  renderBoard();
-  $("fretboard").parentElement.scrollLeft = 0;
 }
 
 function chooseChord(tonic, type, index = 0, note = tonic === chordRoot ? chordNote : roots[tonic]) {
@@ -268,16 +253,8 @@ $("position").addEventListener("change", (event) => {
   activePosition = positions[event.target.value];
   if (activePosition) focusRange(activePosition.min, activePosition.max);
   renderBoard();
-  $("fretboard").parentElement.scrollLeft = 0;
 });
 $("note-label").addEventListener("change", renderBoard);
-$("fret-range").addEventListener("change", (event) => {
-  activeRange = event.target.value.split(",").map(Number);
-  renderBoard();
-  $("fretboard").parentElement.scrollLeft = 0;
-});
-$("previous-range").addEventListener("click", () => shiftRange(-1));
-$("next-range").addEventListener("click", () => shiftRange(1));
 mobile.addEventListener("change", renderBoard);
 $("play-scale").addEventListener("click", async () => {
   const first = tuning[0] + mod(root - tuning[0]);

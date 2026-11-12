@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="style.css?v=piano-smooth">
+<link rel="stylesheet" href="style.css?v=board-scroll">
 <script src="music.js?v=chord-builder" defer></script>
 <script src="neck.js?v=clean-c" defer></script>
-<script src="app.js?v=chord-builder" defer></script>
+<script src="app.js?v=board-scroll" defer></script>
 <script src="piano.js?v=piano-smooth" defer></script>
 <script src="tuner.js?v=mobile-meter" defer></script>
 </head>
@@ -52,11 +52,6 @@
         <div id="board-tones" class="tones"></div>
       </div>
       <div class="board-tools">
-        <div class="range-tools">
-          <button id="previous-range" class="small-button" aria-label="查看更低品位">‹</button>
-          <label><span class="sr-only">指板范围</span><select id="fret-range"></select></label>
-          <button id="next-range" class="small-button" aria-label="查看更高品位">›</button>
-        </div>
         <button id="play-scale" class="secondary">▷ 试听音阶</button>
       </div>
       <div class="board-scroll" tabindex="0" aria-label="指板，较宽时可横向滚动"><div id="fretboard" class="fretboard"></div></div>
@@ -65,7 +60,7 @@
         <strong id="note-readout" aria-live="polite">点击任意弦与品试听</strong>
       </div>
       <p id="board-hint" class="hint"></p>
-      <p class="hint">手机可用多个手指同时按音。横向浏览请拖动指板顶部的品号区域，或切换品位范围。</p>
+      <p class="hint">横向滑动查看 0–24 品，竖向滑动页面。轻触试听，多个手指可同时按音。</p>
     </div>
     <div class="panel key-panel">
       <div><div class="kicker">KEY / HARMONY</div><h3>调内和弦</h3><p>点开指法，也可以直接加到练习。</p></div>
