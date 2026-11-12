@@ -465,6 +465,7 @@ function sameEarAnswer(answer, expected) {
     workspace.setAttribute("aria-modal", "true");
     updateLandscape();
     fitView();
+    jumpTo(60);
     el("piano-span").value = span;
     el("piano-expand").textContent = "退出放大";
     el("piano-expand").focus();
@@ -478,6 +479,8 @@ function sameEarAnswer(answer, expected) {
         try { await screen.orientation?.lock?.("landscape"); } catch { /* Keep the page itself horizontal when device rotation is locked. */ }
         if (!expanded) { try { screen.orientation?.unlock?.(); } catch {} return; }
         updateLandscape();
+        fitView();
+        jumpTo(60);
       } catch { /* The expanded layout remains available without native fullscreen. */ }
     }
   });
