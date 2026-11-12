@@ -27,6 +27,7 @@ function sameEarAnswer(answer, expected) {
   let expanded = false, nativeFullscreen = false, oldOverflow = "", oldSpan, returnFocus;
   let keyWidth = 42;
   let savedKeyWidth, savedScroll, scrollFrame, panPointer, panStart, panScroll;
+  let openingAtC4 = false, openingFrame;
   const useTouchEvents = "ontouchstart" in window || navigator.maxTouchPoints > 0;
   const noteName = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
@@ -416,6 +417,28 @@ function sameEarAnswer(answer, expected) {
   }
   el("piano-zoom-out").addEventListener("click", () => zoom(-1));
   el("piano-zoom-in").addEventListener("click", () => zoom(1));
+  function settleOpeningView() {
+    if (!expanded || !openingAtC4) return;
+    cancelAnimationFrame(openingFrame);
+    openingFrame = requestAnimationFrame(() => {
+      openingFrame = requestAnimationFrame(() => {
+        if (!expanded || !openingAtC4) return;
+        fitView();
+        jumpTo(60);
+      });
+    });
+  }
+  // Moving into the overlay and rotating can reset scrolling after layout.
+  // Keep the opening anchor until the player starts interacting with the piano.
+  function finishOpening(event) {
+    if (event.target === el("piano-expand")) return;
+    openingAtC4 = false;
+    cancelAnimationFrame(openingFrame);
+  }
+  ["pointerdown", "touchstart", "wheel", "keydown"].forEach((type) => {
+    workspace.addEventListener(type, finishOpening, { passive: true });
+  });
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(settleOpeningView).observe(scroll);
   function updateLandscape() {
     const width = (expanded && overlay.clientWidth) || window.visualViewport?.width || window.innerWidth;
     const height = (expanded && overlay.clientHeight) || window.visualViewport?.height || window.innerHeight;
@@ -423,11 +446,14 @@ function sameEarAnswer(answer, expected) {
     workspace.style.setProperty("--piano-long-side", Math.max(width, height) + "px");
     workspace.style.setProperty("--piano-short-side", Math.min(width, height) + "px");
     updateScroll();
+    settleOpeningView();
   }
 
   async function closeExpanded() {
     if (!expanded) return;
     expanded = false;
+    openingAtC4 = false;
+    cancelAnimationFrame(openingFrame);
     silence();
     workspace.classList.remove("expanded");
     workspace.classList.remove("landscape-fixed");
@@ -451,6 +477,7 @@ function sameEarAnswer(answer, expected) {
   el("piano-expand").addEventListener("click", async () => {
     if (expanded) return closeExpanded();
     expanded = true;
+    openingAtC4 = true;
     oldSpan = span;
     savedKeyWidth = keyWidth;
     savedScroll = scroll.scrollLeft;
@@ -468,7 +495,7 @@ function sameEarAnswer(answer, expected) {
     jumpTo(60);
     el("piano-span").value = span;
     el("piano-expand").textContent = "退出放大";
-    el("piano-expand").focus();
+    el("piano-expand").focus({ preventScroll: true });
     el("piano-screen-status").textContent = "横屏布局已锁定，可横持手机弹奏；电脑按 Esc 退出。";
     if (overlay.requestFullscreen) {
       try {
@@ -479,10 +506,9 @@ function sameEarAnswer(answer, expected) {
         try { await screen.orientation?.lock?.("landscape"); } catch { /* Keep the page itself horizontal when device rotation is locked. */ }
         if (!expanded) { try { screen.orientation?.unlock?.(); } catch {} return; }
         updateLandscape();
-        fitView();
-        jumpTo(60);
       } catch { /* The expanded layout remains available without native fullscreen. */ }
     }
+    settleOpeningView();
   });
   document.addEventListener("fullscreenchange", () => { if (nativeFullscreen && document.fullscreenElement !== overlay) void closeExpanded(); });
   window.addEventListener("resize", updateLandscape);
