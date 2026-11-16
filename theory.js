@@ -16,11 +16,35 @@
     return `<details class="basics-topic theory-topic"><summary><span class="basics-number">${number}</span><span><strong>${t(zh, en)}</strong><small>${t(subZh, subEn)}</small></span></summary><div class="basics-body">${content}</div></details>`;
   }
 
-  const intervals = card("01", "半音、全音和音程是什么？", "What are semitones, tones, and intervals?", "先把指板上的距离听出来。", "Hear the distances on the fretboard.",
+  const pianoExamples = [
+    { id: 'keys-bc', zh: '▷ B–C：半音', en: '▷ B–C: semitone', notes: [59,60], path: [59,60], explainZh: 'B 和 C 之间没有黑键，它们就是相邻的两个琴键。只走 1 步 = 1 个半音。', explainEn: 'There is no black key between B and C: they are neighboring keys. One step = one semitone.' },
+    { id: 'keys-ef', zh: '▷ E–F：半音', en: '▷ E–F: semitone', notes: [52,53], path: [52,53], explainZh: 'E 和 F 之间也没有黑键。把黑白键一起算，它们相邻，所以也是 1 个半音。', explainEn: 'E and F also have no black key between them. Counting black and white keys together, they are neighbors: one semitone.' },
+    { id: 'tone', zh: '▷ C–D：全音', en: '▷ C–D: whole tone', notes: [48,50], path: [48,49,50], explainZh: 'C 和 D 之间还有一个黑键 C♯（也叫 D♭）。C → C♯ 走 1 个半音，C♯ → D 再走 1 个半音：合起来 2 个半音 = 1 个全音。', explainEn: 'A black key, C♯ (also D♭), lies between C and D. C → C♯ is one semitone and C♯ → D is another: two semitones = one whole tone.' },
+    { id: 'semitone', zh: '▷ C–C♯：半音', en: '▷ C–C♯: semitone', notes: [48,49], path: [48,49], explainZh: '白键 C 后面紧接着黑键 C♯。相邻的两个琴键相隔 1 个半音；黑键也参与计算。', explainEn: 'The black key C♯ comes immediately after the white C key. Neighboring keys are one semitone apart; black keys count too.' }
+  ];
+  const pianoNames = {48:'C3',49:'C♯3',50:'D3',51:'D♯3',52:'E3',53:'F3',54:'F♯3',55:'G3',56:'G♯3',57:'A3',58:'A♯3',59:'B3',60:'C4'};
+  let selectedPianoExample = pianoExamples[0];
+  const pianoIllustration = `<figure class="interval-keyboard" aria-labelledby="interval-keyboard-title"><figcaption><strong id="interval-keyboard-title">${t('把黑键也算进去，距离就看得见了','Count black keys too: see the distance')}</strong><p>${t('相邻的两个琴键（包括黑键）相差半音。点下面的例子，看图并试听。','Neighboring keys, including black keys, are a semitone apart. Choose an example to see and hear it.')}</p></figcaption><div id="interval-keyboard-drawing"></div><div class="actions piano-example-controls" role="group" aria-label="${t('选择钢琴音程例子','Choose a piano interval example')}">${pianoExamples.map(example=>listen(example.id,example.zh,example.en,example.notes)).join('')}</div><div id="interval-keyboard-steps" class="piano-step-count"></div><p id="interval-keyboard-explain"></p></figure>`;
+
+  function renderPiano(example = selectedPianoExample) {
+    selectedPianoExample = example;
+    const start=example.path[0], end=example.path.at(-1), middle=example.path.slice(1,-1);
+    const color = midi => midi===start?'#d8fb7c':midi===end?'#bca9fb':middle.includes(midi)?'#ffd17b':null;
+    const white=[48,50,52,53,55,57,59,60], blacks=[[49,1],[51,2],[54,4],[56,5],[58,6]];
+    const whiteKeys=white.map((midi,i)=>`<g data-piano-key="${midi}"><rect x="${i*70+1}" y="12" width="68" height="166" rx="5" fill="${color(midi)||'#f6f4fb'}" stroke="#a49bae"/><text x="${i*70+35}" y="153" text-anchor="middle" fill="#282031" font-size="22" font-weight="700">${pianoNames[midi].replace(/\d/,'')}</text><text x="${i*70+35}" y="171" text-anchor="middle" fill="#514759" font-size="13">${pianoNames[midi]}</text></g>`).join('');
+    const blackKeys=blacks.map(([midi,boundary])=>`<g data-piano-key="${midi}"><rect x="${boundary*70-21}" y="12" width="42" height="104" rx="4" fill="${color(midi)||'#292332'}" stroke="#62586c"/><text x="${boundary*70}" y="99" text-anchor="middle" fill="${color(midi)?'#282031':'#f6f4fb'}" font-size="15">${pianoNames[midi].replace(/\d/,'')}</text></g>`).join('');
+    document.getElementById('interval-keyboard-drawing').innerHTML=`<svg viewBox="0 0 560 188" role="img" aria-label="${t('C3 到 C4 的钢琴键盘，标出 '+pianoNames[start]+' 到 '+pianoNames[end]+'，中间共 '+(end-start)+' 个半音。','Piano keys from C3 to C4, highlighting '+pianoNames[start]+' to '+pianoNames[end]+', spanning '+(end-start)+' semitones.')}" xmlns="http://www.w3.org/2000/svg">${whiteKeys}${blackKeys}</svg>`;
+    const steps=document.getElementById('interval-keyboard-steps');
+    steps.innerHTML=example.path.map((midi,index)=>`${index?`<span class="piano-step-arrow"><b>→</b><small>${t('1 半音','1 semitone')}</small></span>`:''}<strong style="--piano-step-color:${color(midi)}">${pianoNames[midi]}</strong>`).join('')+`<span class="piano-step-total">${t('共 '+(end-start)+' 半音'+(end-start===2?' = 1 全音':''),'Total: '+(end-start)+' semitone'+(end-start===1?'':'s')+(end-start===2?' = 1 whole tone':''))}</span>`;
+    document.getElementById('interval-keyboard-explain').textContent=tr(example.explainZh,example.explainEn);
+    host.querySelectorAll('.piano-example-controls button').forEach(button=>button.dataset.pianoCurrent=String(button.dataset.theoryDemo===example.id));
+  }
+
+  const intervals = card("01", "半音、全音和音程是什么？", "What are semitones, tones, and intervals?", "先看钢琴键，再回到吉他指板。", "See the piano keys, then the guitar frets.",
     paragraph("音程是两个音之间的高低距离。它们可以先后响，也可以同时响。", "An interval is the distance in pitch between two notes. You can hear them one after the other or together.") +
+    pianoIllustration +
     flow([["C3", "5 弦 3 品", "String 5, fret 3"], ["C♯3", "5 弦 4 品", "String 5, fret 4"], ["D3", "5 弦 5 品", "String 5, fret 5"]]) +
     paragraph("同一根弦向琴桥方向移动 1 品，升高 1 个半音；移动 2 品，升高 1 个全音。上图每个箭头是 1 个半音。E→F、B→C 也只相隔半音。", "Move one fret toward the bridge on the same string to rise one semitone (half step); two frets make one tone (whole step). Each arrow above is a semitone. E–F and B–C are also a semitone apart.") +
-    `<div class="actions">${listen("semitone", "▷ 半音 C–C♯", "▷ Semitone C–C♯", [48, 49])}${listen("tone", "▷ 全音 C–D", "▷ Whole tone C–D", [48, 50])}</div>` +
     `<div class="basics-tip">${t("音程名还要数音名字母：C–D 是二度，C–E 是三度；再结合实际半音距离，区分大、小、纯等性质。例如 C–E 是大三度（4 半音），C–E♭ 是小三度（3 半音）。", "Interval names also count note letters: C–D is a second and C–E a third. The semitone distance then helps identify major, minor, or perfect quality. C–E is a major third (4 semitones); C–E♭ is a minor third (3).")}</div>`
   );
 
@@ -56,7 +80,7 @@
   );
 
   host.className = "theory-panel";
-  host.innerHTML = `<div class="theory-heading"><h3>${t("看和弦之前，先懂一点乐理", "A little theory before the chord shapes")}</h3>${paragraph("点开需要的解释，边看边听；不必先背完才能弹。", "Open an explanation and listen along. You can play while learning the ideas.")}</div><div class="basics-topics">${intervals}${octave}${strings}${chord}</div><div class="theory-player"><span id="theory-status" role="status">${t("点击卡片中的试听按钮，听听音之间的关系。", "Use the listening buttons in the cards to hear the relationships.")}</span></div><p class="basics-references"><span>${t("资料参考：", "Further reading: ")}</span><a href="https://musictheory.pugetsound.edu/mt21c/IntervalsIntroduction.html" target="_blank" rel="noopener noreferrer">${t("Puget Sound · 音程", "Puget Sound · Intervals")}</a> · <a href="https://musictheory.pugetsound.edu/mt21c/TriadsIntroduction.html" target="_blank" rel="noopener noreferrer">${t("Puget Sound · 三和弦", "Puget Sound · Triads")}</a> · <a href="https://www.fender.com/articles/setup/standard-tuning-how-eadgbe-came-to-be" target="_blank" rel="noopener noreferrer">${t("Fender · 标准调弦", "Fender · Standard tuning")}</a></p>`;
+  host.innerHTML = `<div class="theory-heading"><h3>${t("看和弦之前，先懂一点乐理", "A little theory before the chord shapes")}</h3>${paragraph("点开需要的解释，边看边听；不必先背完才能弹。", "Open an explanation and listen along. You can play while learning the ideas.")}</div><div class="basics-topics">${intervals}${octave}${strings}${chord}</div><div class="theory-player"><span id="theory-status" role="status">${t("点击卡片中的试听按钮，听听音之间的关系。", "Use the listening buttons in the cards to hear the relationships.")}</span></div><p class="basics-references"><span>${t("资料参考：", "Further reading: ")}</span><a href="https://www.musictheory.net/lessons/20" target="_blank" rel="noopener noreferrer">${t("musictheory.net · 半音与全音", "musictheory.net · Steps and accidentals")}</a> · <a href="https://musictheory.pugetsound.edu/mt21c/IntervalsIntroduction.html" target="_blank" rel="noopener noreferrer">${t("Puget Sound · 音程", "Puget Sound · Intervals")}</a> · <a href="https://musictheory.pugetsound.edu/mt21c/TriadsIntroduction.html" target="_blank" rel="noopener noreferrer">${t("Puget Sound · 三和弦", "Puget Sound · Triads")}</a> · <a href="https://www.fender.com/articles/setup/standard-tuning-how-eadgbe-came-to-be" target="_blank" rel="noopener noreferrer">${t("Fender · 标准调弦", "Fender · Standard tuning")}</a></p>`;
 
   const status = document.getElementById("theory-status");
   let generation = 0, bus, activeButton, endTimer, ownAnnouncement = false;
@@ -114,7 +138,13 @@
       status.textContent = tr("试听结束，可以换一组比较。", "Demo finished. Try another comparison.");
     }, demo.together ? 1050 : 2250);
   }
-  host.querySelectorAll("[data-theory-demo]").forEach(button => button.addEventListener("click", () => { void play(button); }));
+  renderPiano();
+  host.querySelectorAll("[data-theory-demo]").forEach(button => button.addEventListener("click", () => {
+    const example=pianoExamples.find(item=>item.id===button.dataset.theoryDemo);
+    if(example)renderPiano(example);
+    void play(button);
+  }));
+  document.addEventListener('languagechange', () => renderPiano());
   host.querySelectorAll("details").forEach(details => details.addEventListener("toggle", () => {
     if (!details.open && activeButton && details.contains(activeButton)) stop(true);
   }));
