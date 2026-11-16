@@ -50,10 +50,10 @@
   }
   function render(){
     renderText();const board=el('board'),max=Number(el('range').value),scroll=board.parentElement.scrollLeft,focused=board.contains(document.activeElement)?document.activeElement.dataset.position:null;
-    board.style.setProperty('--fret-count',max+1);board.style.setProperty('--fret-width','56px');board.replaceChildren();board.append(document.createElement('span'));
+    board.style.setProperty('--fret-count',max+1);board.style.setProperty('--fret-width','56px');board.style.minWidth=(31+(max+1)*56)+"px";board.replaceChildren();board.append(document.createElement('span'));
     for(let fret=0;fret<=max;fret++){const n=document.createElement('span');n.className='fret-number';n.textContent=fret;board.append(n);}
     for(let string=5;string>=0;string--){const label=document.createElement('span');label.className='string-label';label.textContent=(6-string)+note(tuning[string]);board.append(label);
-      for(let fret=0;fret<=max;fret++){const c={string,fret,midi:tuning[string]+fret,key:key(string,fret)},button=document.createElement('button');button.type='button';button.className='fret finder-cell';button.dataset.midi=c.midi;button.dataset.position=c.key;
+      for(let fret=0;fret<=max;fret++){const c={string,fret,midi:tuning[string]+fret,key:key(string,fret)},button=document.createElement('button');button.type='button';button.className='fret finder-cell';button.dataset.midi=c.midi;button.dataset.position=c.key;button.dataset.string=6-string;button.dataset.fret=fret;button.style.setProperty("--gauge",(1+(5-string)*.21)+"px");
         const reference=isAnchor(c),correct=found.has(c.key)||(revealed&&matches(c));button.classList.toggle('finder-anchor',reference);button.classList.toggle('finder-correct',correct);button.classList.toggle('finder-wrong',last?.kind==='wrong'&&last.cell.key===c.key);button.classList.toggle('finder-near',mode()==='near'&&inArea(c));button.classList.toggle('finder-outside',mode()==='near'&&!inArea(c));
         button.setAttribute('aria-label',tr(positionIn(c,false)+(reference?' · 参考位置':''),positionIn(c,true)+(reference?' · Reference':'')));const badge=document.createElement('span');badge.textContent=reference?name(c.midi):(el('labels').checked||correct)?name(c.midi):'·';button.append(badge);button.addEventListener('click',()=>guess(c));board.append(button);
       }

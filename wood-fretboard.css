@@ -1,0 +1,204 @@
+/* Wood, metal frets and strings for the two horizontal learning boards only.
+   Keep the 31px label column and all existing input/scroll behavior intact. */
+#fretboard,
+#finder-board {
+  background-color: #3c2b20;
+  background-image:
+    linear-gradient(180deg, #130d0838, #9a704c0d 47%, #100b0845),
+    repeating-linear-gradient(0deg, #e1bc930e 0 1px, transparent 1px 4px, #100b080e 4px 5px, transparent 5px 12px),
+    repeating-linear-gradient(0deg, transparent 0 23px, #bb8c600c 23px 24px, transparent 24px 37px, #130e0a14 37px 39px, transparent 39px 59px);
+  outline: 1px solid #806247;
+  outline-offset: -1px;
+  box-shadow: inset 0 0 25px #100a0755;
+  border-radius: 5px;
+}
+
+#fretboard > :first-child,
+#finder-board > :first-child,
+#fretboard .fret-number,
+#finder-board .fret-number {
+  height: 26px;
+  background: #1a1922;
+  color: #c6bbcb;
+}
+
+#fretboard .fret-number.marked {
+  color: #f0d59d;
+}
+
+#fretboard .string-label,
+#finder-board .string-label {
+  height: 44px;
+  background: #231c19;
+  color: #e9d6bc;
+  text-shadow: 0 1px 1px #000;
+  box-shadow: inset -1px 0 #80664c;
+}
+
+#fretboard .fret,
+#finder-board .fret {
+  height: 44px;
+  border-right: 2px solid #bab2a3;
+  background: transparent;
+  box-shadow: inset -1px 0 #f5ecdbb0, 1px 0 #130e0b90;
+}
+
+#fretboard .fret.alt,
+#finder-board .fret.alt {
+  background: transparent;
+}
+
+/* Strings sit above the wood and fret wires, below the note markers. */
+#fretboard .fret::before,
+#finder-board .fret::before {
+  inset: 50% -2px auto 0;
+  height: var(--gauge, 1px);
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #fff6df, #c6bdac 47%, #918878 73%, #e8dfcc);
+  box-shadow: 0 1px 1px #100b08a0;
+  opacity: 1;
+  z-index: 1;
+}
+
+#fretboard .fret[data-fret="0"],
+#finder-board .fret[data-fret="0"] {
+  background: #241c16;
+  border-right: 4px solid #eddfbc;
+  box-shadow: inset -1px 0 #fff8e7, 2px 0 2px #130d0990;
+}
+
+#fretboard .fret[data-fret="0"]::before,
+#finder-board .fret[data-fret="0"]::before {
+  right: -4px;
+}
+
+/* Pearl markers lie between the middle strings; octaves have two dots. */
+#fretboard .fret[data-string="3"]:is([data-fret="3"], [data-fret="5"], [data-fret="7"], [data-fret="9"], [data-fret="15"], [data-fret="17"], [data-fret="19"], [data-fret="21"])::after,
+#finder-board .fret[data-string="3"]:is([data-fret="3"], [data-fret="5"], [data-fret="7"], [data-fret="9"], [data-fret="15"], [data-fret="17"], [data-fret="19"], [data-fret="21"])::after,
+#fretboard .fret:is([data-string="2"], [data-string="4"]):is([data-fret="12"], [data-fret="24"])::after,
+#finder-board .fret:is([data-string="2"], [data-string="4"]):is([data-fret="12"], [data-fret="24"])::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #e1d6ba, #ac9c7d);
+  box-shadow: 0 0 0 1px #1a120b75;
+  opacity: .83;
+  z-index: 0;
+}
+
+#fretboard .fret span,
+#finder-board .fret span {
+  position: relative;
+  z-index: 2;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: #241b1650;
+  color: #ead8bc;
+  font-size: 11px;
+  box-shadow: none;
+}
+
+#fretboard .fret.dim span {
+  background: transparent;
+  color: #bea98f;
+}
+
+#fretboard .fret.ghost span {
+  background: #20192465;
+  border-color: #bdabdb;
+  color: #e3d6f4;
+}
+
+#fretboard .fret.tone span {
+  background: #c2a9f8;
+  color: #21192b;
+  border: 1px solid #e9ddffb0;
+  box-shadow: 0 2px 3px #120c0870;
+}
+
+#fretboard .fret.root span {
+  background: #d8fb7c;
+  color: #243013;
+  border: 1px solid #f5ffd0c0;
+  box-shadow: 0 2px 3px #120c0870;
+}
+
+#fretboard .fret:hover,
+#finder-board .fret:hover,
+#fretboard .fret.selected {
+  background: #e6c28b16;
+}
+
+#fretboard .fret.selected span {
+  outline: 2px solid #fff2d3;
+  outline-offset: 2px;
+}
+
+#fretboard .fret.held,
+#fretboard .fret.playing {
+  background: #c98a3f4d;
+  box-shadow: inset -1px 0 #fff4de, inset 0 0 17px #ffd17b40;
+}
+
+#fretboard .fret.held span {
+  outline: 2px solid #fff5da;
+  outline-offset: 2px;
+  box-shadow: 0 0 13px #ffd17bb0;
+}
+
+#fretboard .fret.playing span {
+  background: #ffe19a;
+  color: #271b0e;
+  border-color: #fff5d5;
+  outline: 2px solid #fff5d5;
+  outline-offset: 2px;
+  box-shadow: 0 0 16px #ffcf75c0;
+}
+
+/* Hidden pitches remain neutral; only actual feedback gets colored discs. */
+#finder-board .finder-cell span {
+  background: transparent;
+  color: #d6c3a5;
+  border: 0;
+}
+
+#finder-board .finder-cell.finder-near {
+  background: #d8fb7c14;
+  box-shadow: inset -1px 0 #f5ecdbb0, inset 0 0 0 1px #d8fb7c8a;
+}
+
+#finder-board .finder-cell.finder-outside {
+  opacity: .37;
+}
+
+#finder-board .finder-cell.finder-anchor span {
+  background: #c2a9f8;
+  color: #21192b;
+  border: 1px solid #eee1ff;
+  box-shadow: 0 2px 3px #120c0880;
+}
+
+#finder-board .finder-cell.finder-correct span {
+  background: #d8fb7c;
+  color: #243013;
+  border: 1px solid #f5ffd0;
+  box-shadow: 0 2px 3px #120c0880;
+}
+
+#finder-board .finder-cell.finder-wrong span {
+  background: #ffaaa0;
+  color: #3a1713;
+  border: 1px solid #ffded3;
+  box-shadow: 0 2px 3px #120c0880;
+}
+
+#fretboard .fret:focus-visible,
+#finder-board .fret:focus-visible {
+  outline-offset: -3px;
+}
