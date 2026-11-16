@@ -49,3 +49,18 @@ const updateHeader=()=>document.documentElement.style.setProperty("--site-header
 updateHeader();
 if(typeof ResizeObserver!=="undefined")new ResizeObserver(updateHeader).observe(header);
 })();
+
+(() => {
+  const buttons = document.querySelectorAll('[data-effects-route]');
+  buttons.forEach(button => button.addEventListener('click', () => {
+    buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    document.querySelectorAll('.basics-route').forEach(panel => {
+      panel.hidden = panel.id !== 'effects-route-' + button.dataset.effectsRoute;
+    });
+  }));
+  const openEffects = () => {
+    if (location.hash === '#effects') document.getElementById('effects').open = true;
+  };
+  openEffects();
+  window.addEventListener('hashchange', openEffects);
+})();

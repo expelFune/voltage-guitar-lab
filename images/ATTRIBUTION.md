@@ -24,6 +24,14 @@
 - Source images: https://upload.wikimedia.org/wikipedia/commons/0/0d/Come_tenere_il_plettro_1_-_how_to_hold_the_pick_1.JPG and https://upload.wikimedia.org/wikipedia/commons/f/f2/Come_tenere_il_plettro_2_-_how_to_hold_the_pick_2.JPG
 - Original photographs, unchanged, displayed side by side with separate HTML step captions. The photographer does not endorse this project.
 
+## effects-pedalboard.jpg
+
+- Original: [Guitar effects pedals arranged on a pedalboard in a music studio](https://commons.wikimedia.org/wiki/File:Guitar_effects_pedals_arranged_on_a_pedalboard_in_a_music_studio.jpg)
+- Photographer: Shixart1985
+- License: [Creative Commons Attribution 2.0 Generic (CC BY 2.0)](https://creativecommons.org/licenses/by/2.0/)
+- Source image: https://upload.wikimedia.org/wikipedia/commons/5/53/Guitar_effects_pedals_arranged_on_a_pedalboard_in_a_music_studio.jpg
+- This repository uses the 960-pixel Wikimedia thumbnail, without other image changes. The photographer does not endorse this project.
+
 ## Original diagrams
 
 `guitar-parts.svg`, `fretting-hand.svg`, and `pick-grip.svg` were drawn for Voltage Guitar Lab. They are simplified teaching diagrams, not photographs or model-specific equipment instructions.
