@@ -21,6 +21,7 @@ See the notes. Hear the connections. Play them yourself.
 
 ### 功能
 
+- **[入门科普](https://expelfune.github.io/voltage-guitar-lab/index.html#basics)**：五张可展开的图文卡片，介绍电吉他部件、音箱与声卡连接、持琴和按弦、拨片握法，以及常见声音问题。配有可点选的部件说明、原创示意图和署名授权照片，中英文均可查看。
 - **[互动指板](https://expelfune.github.io/voltage-guitar-lab/index.html#lab)**：以标准调弦 E A D G B E 为基准，提供完整的 0–24 品，支持 12 个根音、多种音阶与不同把位；可切换音名、音级或查看所有音。点击音符试听，手机可多指按音；横划浏览指板，竖划滚动页面。试听音阶时，正在播放的位置会逐个高亮，并显示音名、弦号和品位。
 - **[和弦图鉴](https://expelfune.github.io/voltage-guitar-lab/index.html#chords)**：输入 `C`、`Am7`、`F#7` 等和弦名，查看组成音、开放和弦及不同把位的指法。彩色手指标记配合竖向指板，可以逐弦拨奏或横扫试听。
 - **[节拍练习](https://expelfune.github.io/voltage-guitar-lab/index.html#practice)**：自己输入 `C G Am F`，或按所选调性输入 `1645` 等级数进行。内置卡农 `15634145`、流行 `1564`、爵士 `251` 和 12 小节布鲁斯等预设；支持调整速度、拍数、和弦指法，以及扫弦或分解伴奏。和弦进行及所选练习调性、调式保存在当前浏览器中。
@@ -64,6 +65,7 @@ The [Releases page](https://github.com/expelFune/voltage-guitar-lab/releases) is
 
 ### Features
 
+- **[Getting started](https://expelfune.github.io/voltage-guitar-lab/index.html#basics)**: Five expandable illustrated cards cover guitar parts, amps and audio interfaces, posture and fretting, pick grip, and common sound problems. Includes selectable part descriptions, original diagrams, and a credited licensed photograph in both languages.
 - **[Interactive fretboard](https://expelfune.github.io/voltage-guitar-lab/index.html#lab)**: Explore frets 0–24 in standard E A D G B E tuning, all 12 root notes, multiple scales, and different positions. Switch between note names and scale degrees, or show every note. Tap to listen and use multiple fingers on mobile. Swipe horizontally to explore the neck or vertically to scroll the page. Scale playback highlights each played position and shows its note, string, and fret.
 - **[Chord library](https://expelfune.github.io/voltage-guitar-lab/index.html#chords)**: Enter chord names such as `C`, `Am7`, or `F#7` to see chord tones, open shapes, and voicings at different positions. Color-coded finger markers and a vertical neck diagram let you hear individual strings or strum across them.
 - **[Rhythm practice](https://expelfune.github.io/voltage-guitar-lab/index.html#practice)**: Build a progression with chord names such as `C G Am F`, or enter degrees such as `1645` in your chosen key. Presets include the Canon progression `15634145`, pop `1564`, jazz `251`, and 12-bar blues. Adjust tempo, beats per bar, voicings, and strummed or arpeggiated accompaniment. Your progression and selected practice key/mode are saved in the current browser.

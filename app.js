@@ -878,7 +878,7 @@ $("tempo-up").addEventListener("click", () => changeTempo(Number($("tempo").valu
 document.addEventListener("visibilitychange", () => { if (document.hidden) { stopMetronome(); stopScalePlayback(); } });
 
 function updateNavigation() {
-  const active = location.hash || "#lab";
+  const active = location.hash || "#basics";
   document.querySelectorAll("nav a").forEach((link) => {
     if (link.hash === active) link.setAttribute("aria-current", "location");
     else link.removeAttribute("aria-current");

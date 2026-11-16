@@ -1,6 +1,6 @@
 :root{color-scheme:dark;--bg:#111119;--panel:#1a1a27;--ink:#f6f4fb;--muted:#b3aec4;--line:#363248;--lime:#d8fb7c;--violet:#bca9fb;--mono:"Cascadia Mono",Consolas,monospace}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:80px}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--site-header-height,80px) + 12px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
 a{color:inherit;text-decoration:none}
 button,select,input{font:inherit}
@@ -41,6 +41,47 @@ h1 span{color:var(--lime)}
 .intro-index{position:absolute;right:16px;bottom:12px;color:#d8c5ef;font:9px var(--mono);display:flex;align-items:center;gap:8px}
 .intro-index i{height:1px;width:30px;background:#b8a0df}
 .section{margin-top:24px}
+.basics-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:15px}
+.basics-heading h2{font-size:clamp(24px,3vw,34px);margin:5px 0 8px}
+.basics-heading p{color:var(--muted);max-width:640px;font-size:14px}
+.basics-heading>a{flex:none}
+.basics-topics{display:grid;gap:10px}
+.basics-topic{border:1px solid #41384f;border-radius:13px;background:var(--panel);overflow:hidden}
+.basics-topic>summary{display:flex;align-items:center;gap:14px;padding:17px 20px;cursor:pointer;list-style:none;min-height:78px}
+.basics-topic>summary::-webkit-details-marker{display:none}
+.basics-topic>summary::after{content:"＋";margin-left:auto;font-size:22px;color:var(--violet);flex:none}
+.basics-topic[open]>summary::after{content:"−";color:var(--lime)}
+.basics-topic>summary:focus-visible{outline:2px solid var(--lime);outline-offset:-4px}
+.basics-number{font:700 13px var(--mono);color:var(--lime);width:35px;height:35px;border-radius:11px;background:#d8fb7c12;border:1px solid #d8fb7c30;display:grid;place-items:center;flex:none}
+.basics-topic>summary strong{display:block;font-size:17px;line-height:1.35}
+.basics-topic>summary small{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+.basics-body{border-top:1px solid var(--line);padding:20px;display:grid;gap:18px}
+.basics-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:center}
+.basics-figure{margin:0;min-width:0;background:#211d31;border:1px solid #433651;border-radius:12px;overflow:hidden}
+.basics-figure img{display:block;width:100%;height:auto;aspect-ratio:620/350;object-fit:contain}
+.basics-figure figcaption{padding:10px 13px;border-top:1px solid #3e3450;color:var(--muted);font-size:11px;line-height:1.6}
+.basics-copy{display:grid;gap:12px;min-width:0}
+.basics-copy p,.basics-body>p{font-size:14px;line-height:1.85;color:#d7d1e4}
+.basics-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.basics-parts button{border:1px solid #51435e;border-radius:8px;background:#2a2438;color:var(--ink);padding:8px 7px;min-height:42px;font-size:12px;text-align:left;line-height:1.5}
+.basics-parts button b{font-family:var(--mono);color:var(--violet);margin-right:5px}
+.basics-parts button[aria-pressed=true]{border-color:var(--lime);background:#d8fb7c12}
+.basics-parts button[aria-pressed=true] b{color:var(--lime)}
+.basics-part-note{border-left:3px solid var(--lime);padding:10px 12px;background:#252033;border-radius:0 8px 8px 0;min-height:86px}
+.basics-part-note strong{color:var(--lime);font-size:14px}
+.basics-part-note p{margin-top:4px;font-size:13px;line-height:1.75}
+.basics-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.basics-fact{border:1px solid #40364f;border-radius:10px;padding:14px;background:#211d2e;min-width:0}
+.basics-fact h3{font-size:14px;color:#dfd0ff;margin-bottom:7px}
+.basics-fact p{font-size:13px;line-height:1.8;color:#c8c0d7}
+.basics-flow{display:flex;align-items:center;gap:9px;justify-content:center;padding:17px 10px;border:1px solid #4d3f60;border-radius:10px;background:#292135}
+.basics-flow span{flex:1;min-width:0;text-align:center;font-size:13px;font-weight:700}
+.basics-flow i{font-style:normal;color:var(--lime);font-size:21px;flex:none}
+.basics-tip{border:1px solid #a48b4d66;background:#ffd5790a;border-radius:9px;padding:12px 14px;font-size:13px;line-height:1.8;color:#e8ddc2}
+.basics-body .actions{gap:9px}
+.basics-references{margin-top:13px;font-size:11px;line-height:1.8;color:var(--muted)}
+.basics-references a,.basics-figure figcaption a{color:#d4c5fa;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:760px){.basics-heading{align-items:flex-start;flex-direction:column;gap:10px}.basics-split{grid-template-columns:minmax(0,1fr);gap:15px}.basics-facts{grid-template-columns:minmax(0,1fr)}.basics-topic>summary{padding:14px 12px;gap:10px}.basics-topic>summary strong{font-size:16px}.basics-body{padding:13px;gap:14px}.basics-parts{grid-template-columns:repeat(2,minmax(0,1fr))}.basics-part-note{min-height:0}.basics-heading p{font-size:13px}}
 .section-heading,.panel-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px}
 .section-heading p,.hint,.key-panel p,.practice-copy>p{font-size:12px;color:var(--muted)}
 h2{font-size:27px;line-height:1.2;letter-spacing:-.035em;margin-top:3px}
@@ -267,7 +308,7 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:720px){.tuning{display:none}.shape-list{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}.key-panel{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){
-  html{scroll-padding-top:102px}.header-inner{flex-wrap:wrap;justify-content:space-between;gap:3px 8px;padding-block:5px}.brand{flex:1;justify-content:flex-start}.brand small{display:none}.pick{width:24px;height:25px;font-size:18px}
+  html{scroll-padding-top:calc(var(--site-header-height,102px) + 12px)}.header-inner{flex-wrap:wrap;justify-content:space-between;gap:3px 8px;padding-block:5px}.brand{flex:1;justify-content:flex-start}.brand small{display:none}.pick{width:24px;height:25px;font-size:18px}
   nav{order:3;justify-content:center;width:100%;gap:2px;flex-wrap:wrap}nav a{padding:5px 6px;min-height:32px;font-size:12px}
   .language-switch button{padding:4px 6px;min-height:32px}
   html[lang=en] .brand strong{font-size:14px}

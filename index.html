@@ -6,12 +6,14 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="assets/style-78384b070aa8.css">
+<link rel="stylesheet" href="assets/style-efd92d2685f1.css">
 <script src="assets/translations-a383128e84f9.js" defer></script>
+<script src="assets/basics-translations-f302ddf4f96a.js" defer></script>
 <script src="assets/i18n-429ec6f5a9e4.js" defer></script>
+<script src="assets/basics-cccf83f9f587.js" defer></script>
 <script src="assets/music-6cbc7b669a4d.js" defer></script>
 <script src="assets/neck-f510f6774966.js" defer></script>
-<script src="assets/app-bb5754e56b38.js" defer></script>
+<script src="assets/app-a88874298ed5.js" defer></script>
 <script src="assets/piano-b783333f6050.js" defer></script>
 <script src="assets/tuner-fb7750faabe4.js" defer></script>
 </head>
@@ -19,7 +21,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="#home"><span class="pick" aria-hidden="true">ϟ</span><span><strong>弦上实验室</strong><small>VOLTAGE GUITAR LAB</small></span></a>
-    <nav aria-label="主导航"><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a><a href="#tuner">调音器</a><a href="#piano">钢琴练耳</a></nav>
+    <nav aria-label="主导航"><a href="#basics">入门科普</a><a href="#lab">互动指板</a><a href="#chords">和弦图鉴</a><a href="#practice">节拍练习</a><a href="#tuner">调音器</a><a href="#piano">钢琴练耳</a></nav>
     <span class="tuning"><i class="online"></i> E A D G B E</span>
     <div class="language-switch" role="group" aria-label="界面语言"><button type="button" data-language="zh" lang="zh-CN" aria-pressed="true" data-no-i18n>中文</button><button type="button" data-language="en" lang="en" aria-pressed="false" data-no-i18n>English</button></div>
   </div>
@@ -31,6 +33,16 @@
     <h1 id="title">互动<span>指板</span></h1>
     <p>换一个调，找一个把位。点下去，听听它。</p>
     <div class="intro-index" aria-hidden="true">6 STRINGS <i></i> 24 FRETS</div>
+  </section>
+
+  <section id="basics" class="section basics-section" aria-labelledby="basics-title">
+    <div class="basics-heading"><div><div class="kicker">00 / BEFORE YOU PLAY</div><h2 id="basics-title">先认识你的电吉他</h2><p>看懂器材，把手放对，再拨出一个干净的音。点开想了解的卡片，随时回来查。</p></div><a class="secondary" href="#lab">直接去指板 →</a></div>
+    <div class="basics-topics"><details class="basics-topic" open><summary><span class="basics-number">01</span><span><strong>认识你的电吉他</strong><small>点部件名称，看看它负责什么。</small></span></summary><div class="basics-body"><div class="basics-split"><figure class="basics-figure"><img src="images/guitar-parts.svg" alt="电吉他结构示意，标出琴头、琴颈、拾音器、琴桥、旋钮和输出。" width="620" height="350" loading="lazy"><figcaption>原创结构示意，编号对应下方部件。不同琴型的布局会有差别。</figcaption></figure><div class="basics-copy"><p>电吉他先把弦的振动变成电信号，再让放大系统把声音送出来。不插线也能听到一点琴弦声；接上音箱，才更容易听到它的音色。</p><div class="basics-parts"><button type="button" data-guitar-part="0" aria-pressed="true"><b>1</b>琴头与弦钮</button><button type="button" data-guitar-part="1" aria-pressed="false"><b>2</b>琴颈与品丝</button><button type="button" data-guitar-part="2" aria-pressed="false"><b>3</b>拾音器与切换</button><button type="button" data-guitar-part="3" aria-pressed="false"><b>4</b>琴桥</button><button type="button" data-guitar-part="4" aria-pressed="false"><b>5</b>音量与音色旋钮</button><button type="button" data-guitar-part="5" aria-pressed="false"><b>6</b>输出插孔</button></div><div class="basics-part-note" aria-live="polite"><strong id="basics-part-title">琴头与弦钮</strong><p id="basics-part-text">弦钮用来调节琴弦张力，从而调音。粗弦是第 6 弦，细弦是第 1 弦；先记住标准调弦 E A D G B E。</p></div></div></div></div></details>
+<details class="basics-topic"><summary><span class="basics-number">02</span><span><strong>把声音接出来</strong><small>吉他、音箱、音响、耳机和声卡，分别做什么？</small></span></summary><div class="basics-body"><div class="basics-split"><div class="basics-copy"><div class="basics-flow"><span>电吉他</span><i aria-hidden="true">→</i><span>乐器线</span><i aria-hidden="true">→</i><span>吉他音箱 INPUT</span></div><p>一体式吉他音箱把前级、功率放大和喇叭装在一起。前级塑造音色，后级把信号放大，喇叭把它变成你听到的声音。</p><div class="basics-tip">连接前先把音量调低并关机，插好乐器线，再按设备说明开机、慢慢加音量。先选 Clean 清音和小增益，听清声音后再尝试失真。</div></div><figure class="basics-figure"><img src="images/guitar-and-amplifier.jpg" alt="一把电吉他与一体式吉他音箱的实物照片。" width="620" height="350" loading="lazy"><figcaption>器材外观示例。照片：<a href="https://commons.wikimedia.org/wiki/File:Guitar_and_amplifier.jpg" target="_blank" rel="noopener noreferrer">Markus Spiske / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a> · 缩略展示</figcaption></figure></div><div class="basics-facts"><div class="basics-fact"><h3>Gain 与 Volume</h3><p>Gain 主要影响前级增益和失真程度；Volume / Master 调整响度。不同音箱会相互影响，小幅转动、边听边调。</p></div><div class="basics-fact"><h3>普通音响与声卡</h3><p>吉他接声卡的 INST / Hi-Z 乐器输入，再用电脑的音箱模拟处理，最后接声卡耳机口或监听音箱。普通线路输入与吉他输入并不相同。</p></div><div class="basics-fact"><h3>耳机接哪里？</h3><p>接标有 PHONES / HEADPHONES 的耳机口。SPEAKER OUT 是给箱体喇叭的输出，不能接耳机或声卡。音箱与负载的具体要求按型号说明书来。</p></div></div></div></details>
+<details class="basics-topic"><summary><span class="basics-number">03</span><span><strong>放稳琴，轻轻按弦</strong><small>用位置和放松换来清楚的声音。</small></span></summary><div class="basics-body"><div class="basics-split"><figure class="basics-figure"><img src="images/fretting-hand.svg" alt="按弦示意：指尖落在品丝靠琴头的一侧，避免正压金属品丝。" width="620" height="350" loading="lazy"><figcaption>图中亮点是按弦位置；左边通向琴头，右边通向琴桥。</figcaption></figure><div class="basics-copy"><p>让腿或背带托住琴身，琴颈略微抬起，肩膀放松。先让琴稳住，按弦的手就不用分心抓着它。以下以常见右手琴为例，左手琴左右对换。</p><p>单音先用指尖按弦，尽量靠近目标品丝、停在它的琴头一侧。手指弯曲，给旁边琴弦留出空间；拇指轻靠琴颈后方作支撑。</p><p>先轻按、拨一下，再只增加到声音清楚所需的力度。手腕保持舒适；感觉紧绷或不舒服就先停下放松。</p><div class="basics-tip">指法里的 1、2、3、4 是食指、中指、无名指、小指；不是品号。第 1 品在琴头旁边。</div></div></div></div></details>
+<details class="basics-topic"><summary><span class="basics-number">04</span><span><strong>拿稳拨片，拨响一根弦</strong><small>小幅、放松，先听见一个干净的音。</small></span></summary><div class="basics-body"><div class="basics-split"><figure class="basics-figure"><img src="images/pick-grip.svg" alt="拇指与食指夹住拨片的示意，留出少量尖端接触琴弦。" width="620" height="350" loading="lazy"><figcaption>原创握法示意；可以依手型微调，不必把手攥紧。<br><span>① 拇指 · ② 食指 · ③ 拨片尖端</span></figcaption></figure><div class="basics-copy"><p>把食指自然弯曲，让拨片靠在食指侧面，再用拇指指腹盖住。露出一小截尖端即可，握到它不乱转，又能让手腕自由活动。</p><p>先选一根空弦，用很小的动作向下拨过它，再试向上拨回。让拨片轻轻越过琴弦，先听声音是否清楚，再慢慢扩大到扫弦。</p><p>拨片卡住时，减少插进琴弦的深度，稍微倾斜一点；拨片滑动时，只小幅增加拇指与食指的夹持力。</p><div class="actions"><a class="secondary" href="#chords">去和弦图鉴看指法</a><a class="secondary" href="#tuner">先把琴调准</a></div></div></div></div></details>
+<details class="basics-topic"><summary><span class="basics-number">05</span><span><strong>声音不对？从这里排查</strong><small>把问题拆小，逐根弦、逐个连接检查。</small></span></summary><div class="basics-body"><div class="basics-facts"><div class="basics-fact"><h3>沙沙响、打品</h3><p>先把指尖移近品丝，再小幅增加压力；确认手指没有正压品丝。位置调整后仍持续打品，可能需要检查琴弦高度或琴的设定。</p></div><div class="basics-fact"><h3>旁边的弦不响</h3><p>逐根拨一下，听是哪根弦被碰到。把按弦手指稍微立起来，给邻弦留出空间，再试一次。</p></div><div class="basics-fact"><h3>接好了却没有声音</h3><p>从吉他开始往后检查：琴上的音量、乐器线两端、音箱 INPUT、所选通道与 Master。插拔前把音量调低；耳机练习还要检查插孔是否正确。</p></div></div><div class="actions"><a class="primary" href="#lab">打开互动指板，听听音符</a></div></div></details></div>
+    <p class="basics-references">资料参考：<a href="https://www.yamaha.com/en/musical_instrument_guide/electric_guitar/mechanism/" target="_blank" rel="noopener noreferrer">Yamaha · 电吉他结构</a> · <a href="https://www.fender.com/articles/techniques/get-a-grip-how-to-hold-a-pick" target="_blank" rel="noopener noreferrer">Fender · 握拨片</a> · <a href="https://www.gibson.com/en-eu/blogs/gibson-gazette/video-beginner-hints-and-tips-on-fretting-when-playing-guitar" target="_blank" rel="noopener noreferrer">Gibson · 按弦</a> · <a href="https://cdn.roland.com/assets/media/pdf/KATANA_e02_W.pdf" target="_blank" rel="noopener noreferrer">BOSS · 音箱接口</a> · <a href="https://userguides.focusrite.com/hc/en-gb/articles/17505454851218-Using-your-Scarlett-Solo-4th-Gen" target="_blank" rel="noopener noreferrer">Focusrite · 乐器输入与监听</a></p>
   </section>
 
   <section id="lab" class="section" aria-labelledby="lab-title">
