@@ -3,6 +3,7 @@
 // Exact text-node and attribute translations for the static page.
 // Dynamic UI messages register their complete sentences through tr(zh, en).
 window.STATIC_TRANSLATIONS = {
+  "节拍器音量": "Metronome volume",
   "中文": "Chinese",
   "界面语言": "Interface language",
   "弦上实验室 · 电吉他互动指板": "Voltage Guitar Lab · Interactive Guitar Fretboard",

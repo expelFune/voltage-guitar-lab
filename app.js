@@ -764,11 +764,36 @@ function clickBeat(accent, start) {
   const oscillator = audio.createOscillator();
   const gain = audio.createGain();
   oscillator.frequency.value = accent ? 1120 : 760;
-  gain.gain.setValueAtTime(.13, start);
+  gain.gain.setValueAtTime(accent ? .5 : .4, start);
   gain.gain.exponentialRampToValueAtTime(.001, start + .065);
-  oscillator.connect(gain).connect(practiceBus);
+  oscillator.connect(gain).connect(metronomeBus);
   oscillator.start(start);
   oscillator.stop(start + .07);
+}
+let metronomeBus = null, beatFlashTimer, beatFadeTimer;
+function updateMetronomeVolume() {
+  const volume = Number($("metronome-volume").value);
+  $("metronome-volume-value").value = volume + "%";
+  if (metronomeBus) metronomeBus.gain.setTargetAtTime(volume / 100, audio.currentTime, .01);
+  try { localStorage.setItem("voltage-metronome-volume", String(volume)); } catch {}
+}
+try {
+  const saved = localStorage.getItem("voltage-metronome-volume");
+  if (saved !== null && Number.isFinite(Number(saved)) && Number(saved) >= 0 && Number(saved) <= 100) $("metronome-volume").value = saved;
+} catch {}
+updateMetronomeVolume();
+$("metronome-volume").addEventListener("input", updateMetronomeVolume);
+function flashMetronome(beat, start) {
+  clearTimeout(beatFlashTimer);
+  beatFlashTimer = setTimeout(() => {
+    if (!running) return;
+    const controls = $("metronome-controls");
+    controls.classList.add("beat-flash");
+    controls.classList.toggle("beat-accent", beat === 0);
+    [...$("beats").children].forEach((item, index) => item.classList.toggle("active", index === beat));
+    clearTimeout(beatFadeTimer);
+    beatFadeTimer = setTimeout(() => controls.classList.remove("beat-flash", "beat-accent"), Math.min(160, 30000 / Number($("tempo").value)));
+  }, Math.max(0, (start - audio.currentTime) * 1000));
 }
 function tick() {
   if (!running) return;
@@ -779,6 +804,7 @@ function tick() {
   if (beat === 0 && measure) renderPracticeNeck(measure);
   nextTime = Math.max(nextTime, audio.currentTime + .015);
   clickBeat(beat === 0, nextTime);
+  flashMetronome(beat, nextTime);
   if (measure) {
     const shape = shapeFor(measure);
     const delay = (nextTime - audio.currentTime) * 1000;
@@ -800,7 +826,6 @@ function tick() {
       animateStrum($("practice-neck"), shape, delay);
     }
   }
-  [...$("beats").children].forEach((item, index) => item.classList.toggle("active", index === beat));
   $("progression").querySelectorAll(".measure").forEach((item, index) => item.classList.toggle("active", index === measureIndex));
   $("current-chord").textContent = measure ? tr("第 " + (measureIndex + 1) + " 小节 · " + measureLabel(measure), "Bar " + (measureIndex + 1) + " · " + measureLabel(measure)) : tr("自由节拍", "Free rhythm");
   beatNumber++;
@@ -812,6 +837,11 @@ function stopMetronome() {
   running = false;
   clearTimeout(beatTimer);
   clearTimeout(pickingTimer);
+  clearTimeout(beatFlashTimer);
+  clearTimeout(beatFadeTimer);
+  $("metronome-controls").classList.remove("beat-flash", "beat-accent");
+  metronomeBus?.disconnect();
+  metronomeBus = null;
   clearNeckAnimation($("practice-neck"));
   if (practiceBus) {
     practiceBus.disconnect();
@@ -829,6 +859,9 @@ $("metronome-button").addEventListener("click", async () => {
   nextTime = audio.currentTime + .02;
   practiceBus = audio.createGain();
   practiceBus.connect(audio.destination);
+  metronomeBus = audio.createGain();
+  metronomeBus.gain.value = Number($("metronome-volume").value) / 100;
+  metronomeBus.connect(practiceBus);
   running = true;
   $("metronome-button").textContent = tr("■ 停止练习", "■ Stop practice");
   tick();

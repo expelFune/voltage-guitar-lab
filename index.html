@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#111119">
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
-<link rel="stylesheet" href="assets/style-284db0dd6ab3.css">
-<script src="assets/translations-ee2b1917e5a5.js" defer></script>
+<link rel="stylesheet" href="assets/style-8bbea5729a4f.css">
+<script src="assets/translations-a383128e84f9.js" defer></script>
 <script src="assets/i18n-429ec6f5a9e4.js" defer></script>
 <script src="assets/music-6cbc7b669a4d.js" defer></script>
 <script src="assets/neck-f510f6774966.js" defer></script>
-<script src="assets/app-b95bd81e1d16.js" defer></script>
+<script src="assets/app-9af28afa4fab.js" defer></script>
 <script src="assets/piano-b783333f6050.js" defer></script>
 <script src="assets/tuner-fb7750faabe4.js" defer></script>
 </head>
@@ -137,14 +137,17 @@
       </div>
       <div class="metronome">
         <div class="neck-stage practice-stage"><div class="neck-heading"><span class="kicker">NOW PLAYING</span><strong id="practice-neck-label"></strong></div><div id="practice-neck" class="live-neck"></div><div id="picking-steps" class="picking-steps" aria-label="拨弦顺序"></div><p class="hint" id="picking-hint"></p></div>
+        <div id="metronome-controls" class="metronome-controls">
         <label class="meter-label">弹奏方式 <select id="playback-style"><option value="strum">每小节扫弦</option><option value="arpeggio">八分音符分解</option></select></label>
         <div class="tempo"><output id="tempo-value" for="tempo">70</output> BPM</div>
         <div class="tempo-row"><button id="tempo-down" class="small-button" aria-label="降低 5 BPM">−</button><label class="sr-only" for="tempo">每分钟拍数</label><input type="range" id="tempo" min="35" max="200" value="70"><button id="tempo-up" class="small-button" aria-label="提高 5 BPM">+</button></div>
         <div id="beats" class="beats" aria-label="节拍指示灯"></div>
+        <div class="metronome-volume"><label for="metronome-volume">节拍器音量</label><output id="metronome-volume-value" for="metronome-volume">80%</output><input id="metronome-volume" type="range" min="0" max="100" value="80" step="1"></div>
         <label class="meter-label">每小节 <select id="meter"><option value="3">3 拍</option><option value="4" selected>4 拍</option><option value="6">6 拍</option></select></label>
         <label class="demo-toggle"><input id="practice-demo" type="checkbox" checked> 播放和弦示范</label>
         <button class="primary" id="metronome-button">▶ 开始练习</button>
         <span id="current-chord" class="hint" aria-live="off">准备就绪</span>
+        </div>
       </div>
     </div>
   </section>
