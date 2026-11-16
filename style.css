@@ -166,9 +166,12 @@ select{max-width:100%}
 .measure-actions{display:flex;justify-content:space-between;gap:2px;margin-top:3px}
 .measure-actions button{min-height:30px;min-width:29px;padding:0;font-size:13px}
 .metronome{display:grid;justify-items:center;align-content:start;gap:8px;border-left:1px solid var(--line);padding-left:12px}
-.metronome-controls{display:grid;justify-items:center;gap:8px;width:100%;padding:14px 10px;border:1px solid transparent;border-radius:12px;transition:background-color .1s,border-color .1s,box-shadow .1s}
-.metronome-controls.beat-flash{background:#d8fb7c0b;border-color:#d8fb7c66;box-shadow:inset 0 0 22px #d8fb7c0b}
-.metronome-controls.beat-accent{background:#d8fb7c18;border-color:var(--lime);box-shadow:0 0 18px #d8fb7c20,inset 0 0 24px #d8fb7c12}
+.metronome-controls{display:grid;justify-items:center;gap:8px;width:100%;padding:14px 10px;border:2px solid transparent;border-radius:12px;transition:background-color .08s,border-color .08s,box-shadow .08s}
+.metronome-controls.beat-flash{background:#31422c;border-color:#d8fb7c;box-shadow:0 0 18px #d8fb7c45,inset 0 0 28px #d8fb7c18;transition:none}
+.metronome-controls.beat-accent{background:#455b2d;border-color:#f2ffc8;box-shadow:0 0 25px #d8fb7c70,inset 0 0 32px #d8fb7c25}
+.metronome-controls.beat-flash .tempo{color:#fff;text-shadow:0 0 16px #d8fb7c99}
+.metronome-controls.beat-flash .meter-label,.metronome-controls.beat-flash .demo-toggle,.metronome-controls.beat-flash .hint,.metronome-controls.beat-flash .metronome-volume{color:#f2f7e8}
+.metronome-controls.beat-flash .beats .active{box-shadow:0 0 12px #d8fb7c88;outline:2px solid #f2ffc8;outline-offset:2px}
 .metronome-volume{display:grid;grid-template-columns:1fr auto;gap:5px 10px;width:min(100%,275px);font-size:12px;color:var(--muted);align-items:center}
 .metronome-volume output{color:var(--lime);font-family:var(--mono)}
 .metronome-volume input{grid-column:1/-1;width:100%;min-width:0;margin:0;accent-color:var(--lime)}

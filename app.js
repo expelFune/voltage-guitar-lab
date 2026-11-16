@@ -792,7 +792,7 @@ function flashMetronome(beat, start) {
     controls.classList.toggle("beat-accent", beat === 0);
     [...$("beats").children].forEach((item, index) => item.classList.toggle("active", index === beat));
     clearTimeout(beatFadeTimer);
-    beatFadeTimer = setTimeout(() => controls.classList.remove("beat-flash", "beat-accent"), Math.min(160, 30000 / Number($("tempo").value)));
+    beatFadeTimer = setTimeout(() => controls.classList.remove("beat-flash", "beat-accent"), Math.min(260, 33000 / Number($("tempo").value)));
   }, Math.max(0, (start - audio.currentTime) * 1000));
 }
 function tick() {
