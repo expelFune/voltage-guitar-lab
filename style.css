@@ -382,3 +382,5 @@ footer{display:flex;justify-content:space-between;gap:10px;margin-top:26px;borde
   .measure-actions button,.secondary,.primary,select,.small-button{min-height:40px}.measure-actions button{min-width:34px}.shape-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ringing .string-core{animation:none}.ringing .string-glow{animation-duration:.15s}.tuner-needle,#tuner-input-fill{transition:none}}
+
+.note-finder{display:grid;gap:14px}.note-finder h2{font-size:22px}#finder-target{font:700 32px var(--mono);color:var(--lime)}.finder-reference{font-size:13px;color:var(--violet)}#finder-status{font-size:14px;min-height:24px}.finder-cell{touch-action:pan-x pan-y}.finder-cell span{background:#292337;color:#b3aec4}.finder-cell.finder-anchor span{background:var(--violet);color:#211a30}.finder-cell.finder-correct span{background:var(--lime);color:#202718}.finder-cell.finder-wrong span{background:#ff9b94;color:#301c1a}.note-finder .actions button{min-height:44px}
