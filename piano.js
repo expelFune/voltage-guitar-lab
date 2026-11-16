@@ -33,6 +33,7 @@ function sameEarAnswer(answer, expected) {
   const noteName = (midi) => roots[mod(midi)] + (Math.floor(midi / 12) - 1);
 
   async function ensureAudio() {
+    document.dispatchEvent(new CustomEvent("guitar-instrument-play"));
     try {
       if (!context) {
         const Audio = window.AudioContext || window.webkitAudioContext;
@@ -518,6 +519,7 @@ function sameEarAnswer(answer, expected) {
   window.visualViewport?.addEventListener("resize", updateLandscape);
   window.addEventListener("blur", silence);
   window.addEventListener("pagehide", silence);
+  document.addEventListener("guitar-effects-play", silence);
   document.addEventListener("visibilitychange", () => { if (document.hidden) silence(); });
   el("piano-span").value = span;
   renderKeyboard();

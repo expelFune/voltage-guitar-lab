@@ -35,6 +35,7 @@ function toast(message) {
 let audio;
 let guitarWave;
 async function unlockAudio() {
+  document.dispatchEvent(new CustomEvent("guitar-instrument-play"));
   try {
     const Audio = window.AudioContext || window.webkitAudioContext;
     audio ||= new Audio();
