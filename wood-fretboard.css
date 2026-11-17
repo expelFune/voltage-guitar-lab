@@ -48,16 +48,31 @@
   background: transparent;
 }
 
+/* Exaggerated gauges make the six strings distinguishable at phone sizes. */
+:is(#fretboard, #finder-board) .fret[data-string="1"] { --wood-gauge: 1px; }
+:is(#fretboard, #finder-board) .fret[data-string="2"] { --wood-gauge: 1.5px; }
+:is(#fretboard, #finder-board) .fret[data-string="3"] { --wood-gauge: 2.2px; }
+:is(#fretboard, #finder-board) .fret[data-string="4"] { --wood-gauge: 3px; }
+:is(#fretboard, #finder-board) .fret[data-string="5"] { --wood-gauge: 3.8px; }
+:is(#fretboard, #finder-board) .fret[data-string="6"] { --wood-gauge: 4.8px; }
+
 /* Strings sit above the wood and fret wires, below the note markers. */
 #fretboard .fret::before,
 #finder-board .fret::before {
   inset: 50% -2px auto 0;
-  height: var(--gauge, 1px);
+  height: var(--wood-gauge, var(--gauge, 1px));
   transform: translateY(-50%);
-  background: linear-gradient(180deg, #fff6df, #c6bdac 47%, #918878 73%, #e8dfcc);
+  background: linear-gradient(180deg, #f4f7fa, #c2c9ce 44%, #7c858c 73%, #dce2e6);
   box-shadow: 0 1px 1px #100b08a0;
   opacity: 1;
   z-index: 1;
+}
+
+/* Fine diagonal winding gives the bass strings a metallic, wrapped texture. */
+:is(#fretboard, #finder-board) .fret:is([data-string="4"], [data-string="5"], [data-string="6"])::before {
+  background-image:
+    repeating-linear-gradient(105deg, #ffffff45 0 .6px, #26313c3d .6px 1.3px, transparent 1.3px 2.8px),
+    linear-gradient(180deg, #f1f5f7, #b9c3ca 33%, #7d8992 73%, #cdd6dc);
 }
 
 #fretboard .fret[data-fret="0"],
