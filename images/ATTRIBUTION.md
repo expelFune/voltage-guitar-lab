@@ -1,5 +1,13 @@
 # Image credits
 
+## les-paul-photo.jpg
+
+- Subject: Custom Gibson Les Paul electric guitar, played by Basil Gabbidon of Steel Pulse.
+- Photographer / collection: Birmingham Museums Trust.
+- Source: [Friends of Birmingham Museums, Artefacts, Winter 2023, issue 75, page 34](https://fbmt.org.uk/wp-content/uploads/2023/10/ARTOCT23LR.pdf#page=34).
+- License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The source page states that all photographs are by Birmingham Museums Trust and licensed under CC0.
+- The complete 600 × 993 JPEG embedded in the PDF was extracted unchanged. No image generation, watermark removal, cropping, or retouching was performed. Displayed at a responsive size; click to open the full photograph. Birmingham Museums Trust does not endorse this project.
+
 ## guitar-and-amplifier.jpg
 
 - Original: [Guitar and amplifier](https://commons.wikimedia.org/wiki/File:Guitar_and_amplifier.jpg)
@@ -36,4 +44,4 @@
 
 `guitar-parts.svg`, `fretting-hand.svg`, and `pick-grip.svg` were drawn for Voltage Guitar Lab. They are simplified teaching diagrams, not photographs or model-specific equipment instructions.
 
-The fretting and pick grip cards now use the credited real photographs above. The previous hand SVGs are retained only for older cached pages.
+The guitar introduction, fretting, and pick grip cards now use the credited real photographs above. The previous SVGs are retained only for older cached pages.

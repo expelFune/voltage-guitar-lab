@@ -16,26 +16,26 @@ const parts = [
   [
     "拾音器与切换",
     "Pickups & selector",
-    "拾音器把钢弦的振动转成电信号。切换开关选择拾音器；靠琴桥通常更亮，靠琴颈通常更圆润。",
-    "Pickups convert steel-string vibrations into an electrical signal. The selector chooses the pickup: bridge positions usually sound brighter, neck positions rounder."
+    "照片中的 LP 有两个双线圈拾音器，把钢弦的振动转成电信号。琴身左上方的开关用来切换拾音器；靠琴桥通常更亮，靠琴颈通常更圆润。",
+    "The pictured LP has two humbucking pickups, which convert steel-string vibrations into an electrical signal. The switch at the upper left of the body selects the pickups: bridge sounds are usually brighter, neck sounds rounder."
   ],
   [
-    "琴桥",
-    "Bridge",
-    "琴桥固定并支撑琴弦的一端。有些琴桥带摇把；初学先保持原来的设定，调好音再弹。",
-    "The bridge anchors and supports one end of the strings. Some bridges have a vibrato arm. Start with the existing setup, tune up, and play."
+    "琴桥与尾件",
+    "Bridge & tailpiece",
+    "照片中靠近下方拾音器的金属横条是固定式琴桥，支撑琴弦；再往琴身底部的横条是尾件，用来固定弦尾。这把琴没有摇把。",
+    "The metal bar just below the lower pickup is the fixed bridge, which supports the strings. The next bar toward the bottom of the body is the tailpiece, which anchors their ends. This guitar has no vibrato arm."
   ],
   [
     "音量与音色旋钮",
     "Volume & tone knobs",
-    "琴上的 Volume 控制输出大小，Tone 通常用来削减高频。先用较亮、清楚的声音，便于听清每根弦。",
-    "The guitar’s Volume controls output level; Tone usually rolls off high frequencies. Start with a clear, bright sound so you can hear each string."
+    "这把 LP 的琴身右下方有四个旋钮，分别为两个拾音器调节音量与音色。Volume 控制输出大小，Tone 通常用来削减高频。不同琴型的旋钮布局会有差别。",
+    "The four knobs at the lower right of this LP control volume and tone for its two pickups. Volume adjusts output level; Tone usually rolls off high frequencies. Control layouts vary between guitar models."
   ],
   [
     "输出插孔",
     "Output jack",
-    "乐器线的一端插这里，另一端接音箱的 INPUT。被动电吉他即使不装电池也能发声；主动电路的型号可能需要电池。",
-    "Plug one end of an instrument cable here and the other into the amp’s INPUT. Passive guitars do not need batteries; models with active electronics may need one."
+    "这类 LP 的输出插孔在琴身侧面，正面照片里不明显。乐器线的一端插这里，另一端接音箱的 INPUT。被动电吉他不需要电池；主动电路的型号可能需要电池。",
+    "On this type of LP, the output jack is on the side of the body and is not clearly visible in this front view. Connect it to the amp’s INPUT with an instrument cable. Passive guitars do not need batteries; active electronics may need one."
   ]
 ];
 document.querySelectorAll("[data-guitar-part]").forEach(button => button.addEventListener("click", () => {
