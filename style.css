@@ -59,8 +59,22 @@ h1 span{color:var(--lime)}
 .basics-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:center}
 .basics-figure{margin:0;min-width:0;background:#211d31;border:1px solid #433651;border-radius:12px;overflow:hidden}
 .basics-figure img{display:block;width:100%;height:auto;aspect-ratio:620/350;object-fit:contain}
-.basics-guitar-photo img{height:460px;aspect-ratio:auto;background:#101217;object-fit:contain}
-.basics-guitar-photo>a{display:block;cursor:zoom-in}
+.basics-guitar-photo{background:#101217}
+.basics-guitar-stage{position:relative;width:min(100%,360px);margin-inline:auto;aspect-ratio:600/993}
+.basics-guitar-stage img{width:100%;height:100%;aspect-ratio:600/993;object-fit:contain}
+.basics-guitar-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.basics-guitar-lines path{fill:none;stroke:#e0d1ff;stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.basics-guitar-lines circle{fill:#171322;stroke:#e0d1ff;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.basics-guitar-lines .is-active path,.basics-guitar-lines .is-active circle{stroke:#d8fb7c;stroke-width:2.5}
+.basics-guitar-lines .is-active circle{fill:#d8fb7c;filter:drop-shadow(0 0 4px #d8fb7c)}
+.basics-guitar-label{position:absolute;z-index:1;transform:translateY(-50%);display:flex;align-items:center;gap:4px;width:33.5%;min-height:44px;padding:5px 4px;border:1px solid #77658e;border-radius:7px;background:#171322f2;color:#f4eefb;font-size:11px;line-height:1.4;text-align:left;box-shadow:0 2px 8px #0007}
+.basics-guitar-label span,.basics-side-note span{min-width:0;overflow-wrap:break-word}
+.basics-label-left{left:0}.basics-label-right{right:0}
+.basics-guitar-label b,.basics-side-note b{display:grid;place-items:center;flex:0 0 18px;width:18px;height:18px;border-radius:50%;background:#382c4b;color:#e0d1ff;font:700 11px var(--mono)}
+.basics-guitar-label[aria-pressed=true],.basics-side-note[aria-pressed=true]{border-color:#d8fb7c;background:#29301beF;color:#edffbf}
+.basics-guitar-label[aria-pressed=true] b,.basics-side-note[aria-pressed=true] b{background:#d8fb7c;color:#19200c}
+.basics-guitar-label:focus-visible,.basics-side-note:focus-visible{outline:3px solid #d8fb7c;outline-offset:3px}
+.basics-side-note{display:flex;align-items:center;gap:8px;width:calc(100% - 24px);min-height:44px;margin:0 12px 12px;padding:8px 10px;border:1px dashed #77658e;border-radius:7px;background:#171322;color:#d5c9e5;font-size:11px;line-height:1.5;text-align:left}
 .basics-photo img{aspect-ratio:4/3}
 .basics-photo-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#433651}
 .basics-photo-steps>div{min-width:0;background:#211d31}

@@ -6,7 +6,7 @@
 - Photographer / collection: Birmingham Museums Trust.
 - Source: [Friends of Birmingham Museums, Artefacts, Winter 2023, issue 75, page 34](https://fbmt.org.uk/wp-content/uploads/2023/10/ARTOCT23LR.pdf#page=34).
 - License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The source page states that all photographs are by Birmingham Museums Trust and licensed under CC0.
-- The complete 600 × 993 JPEG embedded in the PDF was extracted unchanged. No image generation, watermark removal, cropping, or retouching was performed. Displayed at a responsive size; click to open the full photograph. Birmingham Museums Trust does not endorse this project.
+- The complete 600 × 993 JPEG embedded in the PDF was extracted unchanged. No image generation, watermark removal, cropping, or retouching was performed. Responsive HTML labels and SVG leader lines are displayed above the original photograph; these annotations were added by Voltage Guitar Lab. The output jack is noted separately because it is not visible from the front. A link opens the unannotated original. Birmingham Museums Trust does not endorse this project.
 
 ## guitar-and-amplifier.jpg
 

@@ -40,7 +40,8 @@ const parts = [
 ];
 document.querySelectorAll("[data-guitar-part]").forEach(button => button.addEventListener("click", () => {
 const part=parts[Number(button.dataset.guitarPart)];
-document.querySelectorAll("[data-guitar-part]").forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
+document.querySelectorAll("[data-guitar-part]").forEach(item=>item.setAttribute("aria-pressed",String(item.dataset.guitarPart===button.dataset.guitarPart)));
+document.querySelectorAll("[data-guitar-marker]").forEach(item=>item.classList.toggle("is-active",item.dataset.guitarMarker===button.dataset.guitarPart));
 document.getElementById("basics-part-title").textContent=tr(part[0],part[1]);
 document.getElementById("basics-part-text").textContent=tr(part[2],part[3]);
 }));
