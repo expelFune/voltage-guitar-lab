@@ -92,7 +92,7 @@ h1 span{color:var(--lime)}
 .picking-string>span{position:relative;display:grid;align-items:center;height:100%;border-right:6px solid #94869e}
 .picking-string>span::before{content:"";height:1px;background:#867a98}
 .picking-string:nth-child(-n+3)>span::before{height:2px}
-.picking-string i[class]{position:absolute;width:10px;height:10px;border-radius:50%;background:#c8a5ff;box-shadow:0 0 0 2px #211d31}
+.picking-string i:where([class]:not([class=""])){position:absolute;width:10px;height:10px;border-radius:50%;background:#c8a5ff;box-shadow:0 0 0 2px #211d31}
 .picking-string .picking-touch{right:12%}
 .picking-string .fretting-touch{left:14%}
 .picking-string .picking-target{left:54%;background:var(--lime)}
