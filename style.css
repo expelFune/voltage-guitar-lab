@@ -84,6 +84,13 @@ h1 span{color:var(--lime)}
 #picking-muting{scroll-margin-top:calc(var(--site-header-height,80px) + 12px)}
 .picking-diagrams{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:12px}
 .picking-figure{display:flex;flex-direction:column}
+.picking-photo-stage{position:relative;display:block;aspect-ratio:4/3;overflow:hidden}
+.picking-photo-stage img{width:100%;height:100%;object-fit:cover}
+.picking-photo-stage:focus-visible{outline:2px solid var(--lime);outline-offset:-3px}
+.picking-photo-marker,.picking-figure figcaption b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--lime);color:#1b2110;font:700 11px var(--mono)}
+.picking-photo-marker{position:absolute;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #171322}
+.picking-figure figcaption p+p{margin-top:5px}
+.picking-photo-credit{font-size:10px}
 .picking-diagram{padding:14px;flex:1}
 .picking-diagram h3{font-size:14px;color:#dfd0ff;margin-bottom:10px}
 .picking-orientation{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}

@@ -40,6 +40,11 @@
 - Source image: https://upload.wikimedia.org/wikipedia/commons/5/53/Guitar_effects_pedals_arranged_on_a_pedalboard_in_a_music_studio.jpg
 - This repository uses the 960-pixel Wikimedia thumbnail, without other image changes. The photographer does not endorse this project.
 
+## Picking and palm-muting photographs
+
+- `electric-guitar-picking.jpg` — [Close-up View of Hand on Electric Guitar](https://www.pexels.com/photo/close-up-view-of-hand-on-electric-guitar-8132950/) by Anna Pou, [Pexels License](https://www.pexels.com/license/). Displayed with a tighter crop and a picking-area marker.
+- `palm-muting-position.jpg` — [Palm muting.jpg](https://commons.wikimedia.org/wiki/File:Palm_muting.jpg) by Elenaf, [public domain](https://commons.wikimedia.org/wiki/Template:PD-self). The 960-pixel preview is displayed with separate HTML markers for the bridge and palm contact.
+
 ## Original diagrams
 
 `guitar-parts.svg`, `fretting-hand.svg`, and `pick-grip.svg` were drawn for Voltage Guitar Lab. They are simplified teaching diagrams, not photographs or model-specific equipment instructions.
