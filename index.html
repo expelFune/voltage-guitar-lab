@@ -7,7 +7,7 @@
 <meta name="description" content="电吉他互动指板，探索 12 个根音的音阶、和弦指法与把位，编排自己的跟拍练习。">
 <title>弦上实验室 · 电吉他互动指板</title>
 <link rel="stylesheet" href="assets/style-9fa494417bea.css">
-<script src="assets/translations-a383128e84f9.js" defer></script>
+<script src="assets/translations-e98e29b33f3f.js" defer></script>
 <script src="assets/basics-translations-0b96987e7197.js" defer></script>
 <script src="assets/i18n-429ec6f5a9e4.js" defer></script>
 <script src="assets/effects-audio-f03bb6c6618a.js" defer></script>
@@ -15,7 +15,7 @@
 <script src="assets/basics-cb4f86e8457f.js" defer></script>
 <script src="assets/music-6cbc7b669a4d.js" defer></script>
 <script src="assets/neck-f510f6774966.js" defer></script>
-<script src="assets/app-8d718e29efb8.js" defer></script>
+<script src="assets/app-4facb966ec90.js" defer></script>
 <script src="assets/piano-ec16a3f08404.js" defer></script>
 <script src="assets/tuner-fb7750faabe4.js" defer></script>
 <script src="assets/note-finder-0daf0b08db05.js" defer></script>
@@ -184,6 +184,7 @@
         <div class="metronome-volume"><label for="metronome-volume">节拍器音量</label><output id="metronome-volume-value" for="metronome-volume">80%</output><input id="metronome-volume" type="range" min="0" max="100" value="80" step="1"></div>
         <label class="meter-label">每小节 <select id="meter"><option value="3">3 拍</option><option value="4" selected>4 拍</option><option value="6">6 拍</option></select></label>
         <label class="demo-toggle"><input id="practice-demo" type="checkbox" checked> 播放和弦示范</label>
+        <label class="demo-toggle"><input id="metronome-flash" type="checkbox" checked> 模块随拍闪烁</label>
         <button class="primary" id="metronome-button">▶ 开始练习</button>
         <span id="current-chord" class="hint" aria-live="off">准备就绪</span>
         </div>

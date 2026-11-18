@@ -765,7 +765,7 @@ function clickBeat(accent, start) {
   const oscillator = audio.createOscillator();
   const gain = audio.createGain();
   oscillator.frequency.value = accent ? 1120 : 760;
-  gain.gain.setValueAtTime(accent ? .5 : .4, start);
+  gain.gain.setValueAtTime(accent ? .65 : .52, start);
   gain.gain.exponentialRampToValueAtTime(.001, start + .065);
   oscillator.connect(gain).connect(metronomeBus);
   oscillator.start(start);
@@ -784,16 +784,30 @@ try {
 } catch {}
 updateMetronomeVolume();
 $("metronome-volume").addEventListener("input", updateMetronomeVolume);
-function flashMetronome(beat, start) {
+const metronomeControls = $("metronome-controls");
+const metronomeFlash = $("metronome-flash");
+const metronomeFlashKey = "voltage-metronome-flash";
+try {
+  metronomeFlash.checked = localStorage.getItem(metronomeFlashKey) !== "off";
+} catch {}
+function clearMetronomeFlash() {
+  clearTimeout(beatFadeTimer);
+  metronomeControls.classList.remove("beat-flash", "beat-accent");
+}
+metronomeFlash.addEventListener("change", () => {
+  if (!metronomeFlash.checked) clearMetronomeFlash();
+  try { localStorage.setItem(metronomeFlashKey, metronomeFlash.checked ? "on" : "off"); } catch {}
+});
+function showMetronomeBeat(beat, start) {
   clearTimeout(beatFlashTimer);
   beatFlashTimer = setTimeout(() => {
     if (!running) return;
-    const controls = $("metronome-controls");
-    controls.classList.add("beat-flash");
-    controls.classList.toggle("beat-accent", beat === 0);
     [...$("beats").children].forEach((item, index) => item.classList.toggle("active", index === beat));
+    if (!metronomeFlash.checked) return;
+    metronomeControls.classList.add("beat-flash");
+    metronomeControls.classList.toggle("beat-accent", beat === 0);
     clearTimeout(beatFadeTimer);
-    beatFadeTimer = setTimeout(() => controls.classList.remove("beat-flash", "beat-accent"), Math.min(260, 33000 / Number($("tempo").value)));
+    beatFadeTimer = setTimeout(clearMetronomeFlash, Math.min(260, 33000 / Number($("tempo").value)));
   }, Math.max(0, (start - audio.currentTime) * 1000));
 }
 function tick() {
@@ -805,7 +819,7 @@ function tick() {
   if (beat === 0 && measure) renderPracticeNeck(measure);
   nextTime = Math.max(nextTime, audio.currentTime + .015);
   clickBeat(beat === 0, nextTime);
-  flashMetronome(beat, nextTime);
+  showMetronomeBeat(beat, nextTime);
   if (measure) {
     const shape = shapeFor(measure);
     const delay = (nextTime - audio.currentTime) * 1000;
@@ -839,8 +853,7 @@ function stopMetronome() {
   clearTimeout(beatTimer);
   clearTimeout(pickingTimer);
   clearTimeout(beatFlashTimer);
-  clearTimeout(beatFadeTimer);
-  $("metronome-controls").classList.remove("beat-flash", "beat-accent");
+  clearMetronomeFlash();
   metronomeBus?.disconnect();
   metronomeBus = null;
   clearNeckAnimation($("practice-neck"));
