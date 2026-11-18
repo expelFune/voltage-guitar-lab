@@ -1,4 +1,4 @@
-:root{color-scheme:dark;--bg:#111119;--panel:#1a1a27;--ink:#f6f4fb;--muted:#b3aec4;--line:#363248;--lime:#d8fb7c;--violet:#bca9fb;--mono:"Cascadia Mono",Consolas,monospace}
+﻿:root{color-scheme:dark;--bg:#111119;--panel:#1a1a27;--ink:#f6f4fb;--muted:#b3aec4;--line:#363248;--lime:#d8fb7c;--violet:#bca9fb;--mono:"Cascadia Mono",Consolas,monospace}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--site-header-height,80px) + 12px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
@@ -81,6 +81,24 @@ h1 span{color:var(--lime)}
 .basics-photo-steps img{aspect-ratio:3/4}
 .basics-photo-steps p{padding:9px 10px;color:var(--ink);font-size:12px;font-weight:700;line-height:1.6}
 .basics-figure figcaption{padding:10px 13px;border-top:1px solid #3e3450;color:var(--muted);font-size:11px;line-height:1.6}
+#picking-muting{scroll-margin-top:calc(var(--site-header-height,80px) + 12px)}
+.picking-diagrams{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:12px}
+.picking-figure{display:flex;flex-direction:column}
+.picking-diagram{padding:14px;flex:1}
+.picking-diagram h3{font-size:14px;color:#dfd0ff;margin-bottom:10px}
+.picking-orientation{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
+.picking-string{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:center;min-height:23px}
+.picking-string b{font:700 11px var(--mono);color:#d7d1e4}
+.picking-string>span{position:relative;display:grid;align-items:center;height:100%;border-right:6px solid #94869e}
+.picking-string>span::before{content:"";height:1px;background:#867a98}
+.picking-string:nth-child(-n+3)>span::before{height:2px}
+.picking-string i[class]{position:absolute;width:10px;height:10px;border-radius:50%;background:#c8a5ff;box-shadow:0 0 0 2px #211d31}
+.picking-string .picking-touch{right:12%}
+.picking-string .fretting-touch{left:14%}
+.picking-string .picking-target{left:54%;background:var(--lime)}
+.picking-string .picking-palm{right:3%;background:#ffd17b}
+#picking-muting .basics-tip a{color:var(--lime);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:760px){.picking-diagrams{grid-template-columns:minmax(0,1fr)}}
 .basics-copy{display:grid;gap:12px;min-width:0}
 .basics-copy p,.basics-body>p{font-size:14px;line-height:1.85;color:#d7d1e4}
 .basics-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}

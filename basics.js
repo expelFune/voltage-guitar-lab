@@ -59,9 +59,10 @@ if(typeof ResizeObserver!=="undefined")new ResizeObserver(updateHeader).observe(
       panel.hidden = panel.id !== 'effects-route-' + button.dataset.effectsRoute;
     });
   }));
-  const openEffects = () => {
-    if (location.hash === '#effects') document.getElementById('effects').open = true;
+  const openLinkedTopic = () => {
+    const topic = document.getElementById(location.hash.slice(1));
+    if (topic?.matches('details.basics-topic')) topic.open = true;
   };
-  openEffects();
-  window.addEventListener('hashchange', openEffects);
+  openLinkedTopic();
+  window.addEventListener('hashchange', openLinkedTopic);
 })();
